@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PBI Wallpaper Colour Shifter</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        boro: {
+          teal: '#006B6B',
+          'teal-dark': '#004D4D',
+          'teal-light': '#008F8F',
+          'teal-50': '#E6F5F5',
+          'teal-100': '#B3E0E0',
+          dark: '#1A1A1A',
+          medium: '#555555',
+          light: '#777777',
+          muted: '#999999',
+          border: '#DEE2E6',
+          'bg-light': '#F7F8F9',
+        }
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Playfair Display', 'serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F7F8F9;
+    color: #1A1A1A;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  ::selection { background: #006B6B; color: #fff; }
+
+  .top-bar {
+    background: #004D4D;
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 0.4rem 0;
+  }
+  .top-bar-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .app-nav {
+    background: #006B6B;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .app-nav-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 0.6rem; }
+  .nav-logo-icon {
+    width: 34px; height: 34px; background: #fff; border-radius: 8px;
+    display: grid; place-items: center; overflow: hidden;
+  }
+  .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .nav-logo-text { color: #fff; font-weight: 600; font-size: 0.95rem; }
+  .nav-logo-sub { color: #B3E0E0; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .nav-back {
+    display: flex; align-items: center; gap: 0.4rem;
+    color: #B3E0E0; font-size: 0.8rem; font-weight: 500;
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-back:hover { color: #fff; }
+
+  .app {
+    position: relative; z-index: 1; max-width: 1440px;
+    margin: 0 auto; padding: 1.2rem 1.5rem 2rem;
+    flex: 1; width: 100%;
+  }
+
+  .app-header { padding: 1.2rem 0 0.6rem; }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.65rem; font-weight: 700; color: #1A1A1A;
+    letter-spacing: -0.02em;
+  }
+  .header-subtitle {
+    font-size: 0.85rem; color: #555555; margin-top: 0.4rem;
+    line-height: 1.55; max-width: 720px;
+  }
+
+  /* Colour inputs bar */
+  .colour-bar {
+    display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;
+    padding: 0.85rem 1.1rem; background: #fff;
+    border: 1px solid #DEE2E6; border-radius: 10px;
+    margin-bottom: 1rem;
+  }
+  .colour-field {
+    display: flex; flex-direction: column; gap: 0.35rem; flex: 1; min-width: 200px;
+  }
+  .colour-field-label {
+    font-size: 0.75rem; font-weight: 600; color: #555555;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 0.35rem;
+  }
+  .colour-field-label .default-tag {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.68rem; font-weight: 500; color: #999999;
+    background: #F7F8F9; padding: 0.1rem 0.4rem;
+    border-radius: 4px; border: 1px solid #DEE2E6;
+  }
+  .colour-input-wrap {
+    display: flex; align-items: center; gap: 0;
+    border: 1px solid #DEE2E6; border-radius: 8px;
+    overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s;
+    background: #F7F8F9;
+  }
+  .colour-input-wrap:focus-within {
+    border-color: #006B6B;
+    box-shadow: 0 0 0 2px rgba(0,107,107,0.1);
+    background: #fff;
+  }
+  .colour-input-wrap.valid { border-color: #16a34a; }
+  .colour-input-wrap.valid:focus-within { box-shadow: 0 0 0 2px rgba(22,163,74,0.1); }
+  .colour-input-wrap.invalid { border-color: #dc2626; }
+  .colour-input-wrap.invalid:focus-within { box-shadow: 0 0 0 2px rgba(220,38,38,0.1); }
+
+  /* Swatch with colour picker overlay */
+  .colour-swatch {
+    width: 38px; height: 38px; flex-shrink: 0;
+    border-right: 1px solid #DEE2E6;
+    display: grid; place-items: center;
+    position: relative; cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .colour-swatch-inner {
+    width: 22px; height: 22px; border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.1);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .colour-swatch:hover .colour-swatch-inner {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 2px rgba(0,107,107,0.25);
+  }
+  .colour-swatch input[type="color"] {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer; border: none; padding: 0;
+  }
+  .colour-swatch .picker-hint {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    opacity: 0; transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .colour-swatch:hover .picker-hint { opacity: 1; }
+  .picker-hint-icon {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(0,0,0,0.45); backdrop-filter: blur(2px);
+    display: grid; place-items: center;
+  }
+
+  .colour-input {
+    flex: 1; border: none; background: transparent;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.85rem; color: #1A1A1A; padding: 0.5rem 0.7rem;
+    outline: none; min-width: 0;
+  }
+  .colour-input::placeholder { color: #999999; }
+
+  /* Split pane */
+  .split-pane {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1rem; margin-bottom: 1rem;
+  }
+  @media (max-width: 800px) { .split-pane { grid-template-columns: 1fr; } }
+
+  .pane {
+    display: flex; flex-direction: column;
+    background: #fff; border: 1px solid #DEE2E6;
+    border-radius: 12px; overflow: hidden; min-height: 380px;
+    transition: border-color 0.2s;
+  }
+  .pane-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.6rem 1rem; background: #F7F8F9;
+    border-bottom: 1px solid #DEE2E6;
+    font-size: 0.75rem; font-weight: 600; color: #555555;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .pane-header .actions { display: flex; gap: 0.4rem; }
+  .pane-header button {
+    background: #fff; border: 1px solid #DEE2E6;
+    border-radius: 6px; color: #777777; padding: 0.3rem 0.6rem;
+    font-size: 0.72rem; cursor: pointer; transition: all 0.2s;
+    font-family: inherit; display: flex; align-items: center; gap: 0.3rem;
+  }
+  .pane-header button:hover { color: #006B6B; border-color: #006B6B; background: #E6F5F5; }
+  .pane-header button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pane-header button:disabled:hover { color: #777777; border-color: #DEE2E6; background: #fff; }
+
+  .pane-body {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 1rem; overflow: auto; position: relative;
+  }
+  .pane-body::-webkit-scrollbar { width: 8px; }
+  .pane-body::-webkit-scrollbar-track { background: transparent; }
+  .pane-body::-webkit-scrollbar-thumb { background: #DEE2E6; border-radius: 4px; }
+
+  /* Drop zone */
+  .drop-zone {
+    width: 100%; height: 100%; min-height: 300px;
+    border: 2px dashed #DEE2E6; border-radius: 8px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 0.8rem;
+    cursor: pointer; transition: all 0.25s;
+    color: #999999;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: #006B6B; background: #E6F5F5; color: #006B6B;
+  }
+  .drop-zone.drag-over .drop-icon { transform: scale(1.1); }
+  .drop-icon { transition: transform 0.2s; }
+  .drop-title { font-size: 0.9rem; font-weight: 600; }
+  .drop-subtitle { font-size: 0.75rem; }
+
+  /* SVG preview */
+  .svg-preview {
+    width: 100%; height: 100%; display: flex;
+    align-items: center; justify-content: center;
+    padding: 0.5rem;
+  }
+  .svg-preview img, .svg-preview svg {
+    max-width: 100%; max-height: 340px; object-fit: contain;
+    border-radius: 4px;
+  }
+
+  /* Placeholder */
+  .placeholder-msg {
+    color: #999999; font-size: 0.85rem;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 0.5rem; text-align: center;
+    padding: 2rem;
+  }
+  .placeholder-msg iconify-icon { opacity: 0.4; }
+
+  /* Action bar */
+  .action-bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap;
+  }
+  .btn-primary {
+    padding: 0.65rem 1.8rem; background: #006B6B; color: #fff;
+    border: none; border-radius: 10px; font-family: inherit;
+    font-size: 0.88rem; font-weight: 600; cursor: pointer;
+    transition: all 0.25s; display: flex; align-items: center; gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,107,107,0.2);
+  }
+  .btn-primary:hover { background: #004D4D; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,107,107,0.3); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-primary:disabled:hover { background: #006B6B; }
+
+  .btn-secondary {
+    padding: 0.6rem 1.3rem; background: #fff;
+    color: #555555; border: 1px solid #DEE2E6;
+    border-radius: 10px; font-family: inherit; font-size: 0.85rem;
+    font-weight: 500; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .btn-secondary:hover { background: #E6F5F5; border-color: #008F8F; color: #006B6B; }
+  .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-secondary:disabled:hover { background: #fff; border-color: #DEE2E6; color: #555555; }
+
+  /* Shift key visual */
+  .shift-key {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+    border: 1px solid #ccc; border-bottom-width: 3px;
+    border-radius: 5px; padding: 0.15rem 0.6rem;
+    font-family: inherit; font-size: 0.75rem; font-weight: 600;
+    color: #555; box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    transition: all 0.15s;
+    line-height: 1.3;
+  }
+  .shift-key.pressed {
+    border-bottom-width: 1px;
+    transform: translateY(2px);
+    background: linear-gradient(180deg, #e6f5f5 0%, #d0ecec 100%);
+    border-color: #006B6B;
+    color: #006B6B;
+    box-shadow: 0 0 8px rgba(0,107,107,0.2);
+  }
+
+  .shift-hint {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-size: 0.82rem; color: #777777;
+  }
+
+  /* Error / success messages */
+  .msg-box {
+    border-radius: 10px; padding: 0.75rem 1rem;
+    font-size: 0.85rem; font-weight: 500;
+    display: flex; align-items: center; gap: 0.6rem;
+    animation: fadeSlideUp 0.35s ease;
+    margin-bottom: 1rem;
+  }
+  .msg-box.error { background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; }
+  .msg-box.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; }
+  .msg-box.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #2563eb; }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100;
+    padding: 0.6rem 1.2rem; background: #1A1A1A;
+    border-radius: 8px; color: #fff; font-size: 0.82rem; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    transform: translateY(20px); opacity: 0;
+    transition: all 0.3s ease; pointer-events: none;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .toast.visible { transform: translateY(0); opacity: 1; }
+
+  /* Footer */
+  .app-footer {
+    background: #fff; border-top: 1px solid #DEE2E6;
+    padding: 1.2rem 1.5rem; text-align: center;
+    margin-top: auto;
+  }
+  .app-footer p { font-size: 0.82rem; color: #999999; }
+
+  /* File info */
+  .file-info {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.72rem; color: #999999; padding: 0.3rem 0;
+  }
+  .file-info iconify-icon { color: #006B6B; }
+
+  /* Entrance */
+  .app > * { animation: fadeIn 0.45s ease both; }
+  .app > *:nth-child(2) { animation-delay: 0.04s; }
+  .app > *:nth-child(3) { animation-delay: 0.08s; }
+  .app > *:nth-child(4) { animation-delay: 0.12s; }
+  .app > *:nth-child(5) { animation-delay: 0.16s; }
+  .app > *:nth-child(6) { animation-delay: 0.2s; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <iconify-icon icon="lucide:database" width="11"></iconify-icon>
+    Data Analytics & Insights Tool
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav class="app-nav">
+  <div class="app-nav-inner">
+    <div class="nav-logo">
+      <div class="nav-logo-icon"><img src="img/logo.png" alt="Logo"></div>
+      <div>
+        <div class="nav-logo-text">Colour Shifter</div>
+        <div class="nav-logo-sub">City of Boroondara</div>
+      </div>
+    </div>
+    <a href="../../../index.html" class="nav-back">
+      <iconify-icon icon="lucide:arrow-left" width="15"></iconify-icon>
+      Back to Projects
+    </a>
+  </div>
+</nav>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <h1 class="header-title">PBI Wallpaper Colour Shifter</h1>
+    <p class="header-subtitle">
+      Quickly swap the colour palette of your Power BI wallpaper SVG files. Upload an SVG, 
+      enter your desired hex colour codes (or click the swatch to pick a colour), and press 
+      <strong>Shift</strong> to generate a recoloured version. The tool replaces specific colours 
+      within the SVG source — primary 
+      (<code style="font-size:0.78rem;background:#F7F8F9;padding:0.1rem 0.35rem;border-radius:3px;border:1px solid #DEE2E6">#2C5234</code>), 
+      secondary (<code style="font-size:0.78rem;background:#F7F8F9;padding:0.1rem 0.35rem;border-radius:3px;border:1px solid #DEE2E6">#f5f5f5</code>), 
+      and tertiary (<code style="font-size:0.78rem;background:#F7F8F9;padding:0.1rem 0.35rem;border-radius:3px;border:1px solid #DEE2E6">#e6e6e6</code>) — with your custom values.
+    </p>
+  </header>
+
+  <!-- Colour Inputs -->
+  <div class="colour-bar">
+    <!-- Primary -->
+    <div class="colour-field">
+      <label class="colour-field-label">
+        <iconify-icon icon="lucide:palette" width="13" style="color:#006B6B"></iconify-icon>
+        Primary Colour
+        <span class="default-tag">#2C5234</span>
+      </label>
+      <div class="colour-input-wrap" id="primaryWrap">
+        <div class="colour-swatch">
+          <div class="colour-swatch-inner" id="primarySwatch" style="background:#2C5234"></div>
+          <input type="color" id="primaryPicker" value="#2C5234" title="Pick a colour">
+          <div class="picker-hint">
+            <div class="picker-hint-icon">
+              <iconify-icon icon="lucide:pipette" width="10" style="color:#fff"></iconify-icon>
+            </div>
+          </div>
+        </div>
+        <input type="text" class="colour-input" id="primaryInput" placeholder="#2C5234" maxlength="7" spellcheck="false">
+      </div>
+    </div>
+    <!-- Secondary -->
+    <div class="colour-field">
+      <label class="colour-field-label">
+        <iconify-icon icon="lucide:palette" width="13" style="color:#008F8F"></iconify-icon>
+        Secondary Colour
+        <span class="default-tag">#f5f5f5</span>
+      </label>
+      <div class="colour-input-wrap" id="secondaryWrap">
+        <div class="colour-swatch">
+          <div class="colour-swatch-inner" id="secondarySwatch" style="background:#f5f5f5"></div>
+          <input type="color" id="secondaryPicker" value="#f5f5f5" title="Pick a colour">
+          <div class="picker-hint">
+            <div class="picker-hint-icon">
+              <iconify-icon icon="lucide:pipette" width="10" style="color:#fff"></iconify-icon>
+            </div>
+          </div>
+        </div>
+        <input type="text" class="colour-input" id="secondaryInput" placeholder="#f5f5f5" maxlength="7" spellcheck="false">
+      </div>
+    </div>
+    <!-- Tertiary -->
+    <div class="colour-field">
+      <label class="colour-field-label">
+        <iconify-icon icon="lucide:palette" width="13" style="color:#00b894"></iconify-icon>
+        Tertiary Colour
+        <span class="default-tag">#e6e6e6</span>
+      </label>
+      <div class="colour-input-wrap" id="tertiaryWrap">
+        <div class="colour-swatch">
+          <div class="colour-swatch-inner" id="tertiarySwatch" style="background:#e6e6e6"></div>
+          <input type="color" id="tertiaryPicker" value="#e6e6e6" title="Pick a colour">
+          <div class="picker-hint">
+            <div class="picker-hint-icon">
+              <iconify-icon icon="lucide:pipette" width="10" style="color:#fff"></iconify-icon>
+            </div>
+          </div>
+        </div>
+        <input type="text" class="colour-input" id="tertiaryInput" placeholder="#e6e6e6" maxlength="7" spellcheck="false">
+      </div>
+    </div>
+  </div>
+
+  <!-- Split Pane -->
+  <div class="split-pane">
+    <!-- Original -->
+    <div class="pane">
+      <div class="pane-header">
+        <span>
+          <iconify-icon icon="lucide:image" width="13" style="margin-right:0.3rem;vertical-align:-2px"></iconify-icon>
+          Original
+        </span>
+        <div class="actions">
+          <button id="uploadBtn" onclick="document.getElementById('fileInput').click()">
+            <iconify-icon icon="lucide:upload" width="12"></iconify-icon> Upload
+          </button>
+          <button id="clearBtn" onclick="clearAll()" disabled>
+            <iconify-icon icon="lucide:x" width="12"></iconify-icon> Clear
+          </button>
+        </div>
+      </div>
+      <div class="pane-body" id="originalPane">
+        <div class="drop-zone" id="dropZone">
+          <iconify-icon icon="lucide:upload-cloud" width="40" class="drop-icon"></iconify-icon>
+          <div class="drop-title">Drop your SVG file here</div>
+          <div class="drop-subtitle">or click to browse — SVG files only</div>
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept=".svg,image/svg+xml" style="display:none">
+    </div>
+
+    <!-- Modified -->
+    <div class="pane">
+      <div class="pane-header">
+        <span>
+          <iconify-icon icon="lucide:paintbrush" width="13" style="margin-right:0.3rem;vertical-align:-2px"></iconify-icon>
+          Modified
+        </span>
+        <div class="actions">
+          <button id="downloadBtn" onclick="downloadFile()" disabled>
+            <iconify-icon icon="lucide:download" width="12"></iconify-icon> Download
+          </button>
+          <button id="saveBtn" onclick="saveAsFile()" disabled>
+            <iconify-icon icon="lucide:save" width="12"></iconify-icon> Save As
+          </button>
+        </div>
+      </div>
+      <div class="pane-body" id="modifiedPane">
+        <div class="placeholder-msg" id="modifiedPlaceholder">
+          <iconify-icon icon="lucide:arrow-left" width="32"></iconify-icon>
+          <span>Press <span class="shift-key" id="shiftKeyHint">⇧ Shift</span> to apply colours</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="shift-hint">
+      <span class="shift-key" id="shiftKeyBar">⇧ Shift</span>
+      <span>to apply colours</span>
+    </div>
+    <button class="btn-secondary" onclick="resetPage()" id="resetBtn">
+      <iconify-icon icon="lucide:rotate-ccw" width="14"></iconify-icon> Reset
+    </button>
+  </div>
+
+  <!-- Message area -->
+  <div id="msgArea"></div>
+
+</div>
+
+<!-- Footer -->
+<footer class="app-footer">
+  <p>For questions, please contact the Data Analytics & Insights Team</p>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <iconify-icon icon="lucide:check-circle" width="15" style="color:#16a34a"></iconify-icon>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let originalSVGText = null;
+let modifiedSVGText = null;
+let fileName = 'wallpaper.svg';
+
+// Default colours from the R code
+const DEFAULTS = {
+  primary: '#2C5234',
+  secondary: '#f5f5f5',
+  tertiary: '#e6e6e6'
+};
+
+// ============================================================
+// ELEMENTS
+// ============================================================
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+const originalPane = document.getElementById('originalPane');
+const modifiedPane = document.getElementById('modifiedPane');
+const modifiedPlaceholder = document.getElementById('modifiedPlaceholder');
+
+const colourConfig = [
+  { key: 'primary',   input: document.getElementById('primaryInput'),   picker: document.getElementById('primaryPicker'),   swatch: document.getElementById('primarySwatch'),   wrap: document.getElementById('primaryWrap') },
+  { key: 'secondary', input: document.getElementById('secondaryInput'), picker: document.getElementById('secondaryPicker'), swatch: document.getElementById('secondarySwatch'), wrap: document.getElementById('secondaryWrap') },
+  { key: 'tertiary',  input: document.getElementById('tertiaryInput'),  picker: document.getElementById('tertiaryPicker'),  swatch: document.getElementById('tertiarySwatch'),  wrap: document.getElementById('tertiaryWrap') }
+];
+
+const downloadBtn = document.getElementById('downloadBtn');
+const saveBtn = document.getElementById('saveBtn');
+const clearBtn = document.getElementById('clearBtn');
+const msgArea = document.getElementById('msgArea');
+const shiftKeyHint = document.getElementById('shiftKeyHint');
+const shiftKeyBar = document.getElementById('shiftKeyBar');
+
+// ============================================================
+// COLOUR INPUT ↔ PICKER SYNC
+// ============================================================
+colourConfig.forEach(({ key, input, picker, swatch, wrap }) => {
+  const defaultColor = DEFAULTS[key];
+
+  // Picker → text input
+  picker.addEventListener('input', () => {
+    input.value = picker.value.toUpperCase();
+    swatch.style.background = picker.value;
+    wrap.classList.remove('valid', 'invalid');
+    wrap.classList.add('valid');
+  });
+
+  // Text input → swatch + picker
+  input.addEventListener('input', () => {
+    const state = isValidHex(input.value);
+    wrap.classList.remove('valid', 'invalid');
+
+    if (state === 'valid') {
+      swatch.style.background = input.value.trim();
+      picker.value = input.value.trim().toLowerCase();
+      wrap.classList.add('valid');
+    } else if (state === 'invalid') {
+      swatch.style.background = defaultColor;
+      wrap.classList.add('invalid');
+    } else {
+      swatch.style.background = defaultColor;
+    }
+  });
+
+  // Auto-add # if missing on blur
+  input.addEventListener('blur', () => {
+    const val = input.value.trim();
+    if (val && !val.startsWith('#')) {
+      input.value = '#' + val;
+      input.dispatchEvent(new Event('input'));
+    }
+  });
+});
+
+// ============================================================
+// FILE UPLOAD
+// ============================================================
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropZone.classList.add('drag-over');
+});
+
+dropZone.addEventListener('dragleave', () => {
+  dropZone.classList.remove('drag-over');
+});
+
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) handleFile(fileInput.files[0]);
+});
+
+function handleFile(file) {
+  if (!file.name.toLowerCase().endsWith('.svg') && file.type !== 'image/svg+xml') {
+    showMessage('error', 'Please upload an SVG file. This tool works with SVG files only.');
+    return;
+  }
+
+  fileName = file.name;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    originalSVGText = e.target.result;
+    modifiedSVGText = null;
+
+    renderSVGPreview(originalPane, originalSVGText);
+
+    // Show file info
+    const existingInfo = originalPane.querySelector('.file-info');
+    if (existingInfo) existingInfo.remove();
+    const info = document.createElement('div');
+    info.className = 'file-info';
+    info.innerHTML = `<iconify-icon icon="lucide:file-check" width="13"></iconify-icon> ${fileName}`;
+    originalPane.appendChild(info);
+
+    clearBtn.disabled = false;
+
+    // Reset modified pane
+    modifiedPane.innerHTML = '';
+    const ph = document.createElement('div');
+    ph.className = 'placeholder-msg';
+    ph.id = 'modifiedPlaceholder';
+    ph.innerHTML = `
+      <iconify-icon icon="lucide:arrow-left" width="32"></iconify-icon>
+      <span>Press <span class="shift-key" id="shiftKeyHint">⇧ Shift</span> to apply colours</span>
+    `;
+    modifiedPane.appendChild(ph);
+    downloadBtn.disabled = true;
+    saveBtn.disabled = true;
+
+    clearMessage();
+    showToast('SVG uploaded successfully');
+  };
+  reader.readAsText(file);
+}
+
+function renderSVGPreview(container, svgText) {
+  const dz = container.querySelector('.drop-zone');
+  if (dz) dz.remove();
+  const oldPreview = container.querySelector('.svg-preview');
+  if (oldPreview) oldPreview.remove();
+  const oldInfo = container.querySelector('.file-info');
+  if (oldInfo) oldInfo.remove();
+
+  const preview = document.createElement('div');
+  preview.className = 'svg-preview';
+  const blob = new Blob([svgText], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = 'SVG Preview';
+  img.onload = () => URL.revokeObjectURL(url);
+  preview.appendChild(img);
+  container.appendChild(preview);
+}
+
+// ============================================================
+// HEX VALIDATION
+// ============================================================
+function isValidHex(val) {
+  if (!val || val.trim() === '') return 'empty';
+  return /^#[0-9A-Fa-f]{6}$/.test(val.trim()) ? 'valid' : 'invalid';
+}
+
+// ============================================================
+// SHIFT KEY DETECTION
+// ============================================================
+let shiftPressed = false;
+let otherKeyDuringShift = false;
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Shift') {
+    shiftPressed = true;
+    otherKeyDuringShift = false;
+    // Animate all shift key hints on page
+    document.querySelectorAll('.shift-key').forEach(el => el.classList.add('pressed'));
+  } else if (shiftPressed) {
+    otherKeyDuringShift = true;
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  if (e.key === 'Shift') {
+    document.querySelectorAll('.shift-key').forEach(el => el.classList.remove('pressed'));
+
+    if (shiftPressed && !otherKeyDuringShift) {
+      const active = document.activeElement;
+      const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
+      if (!isTyping) {
+        applyColours();
+      }
+    }
+    shiftPressed = false;
+    otherKeyDuringShift = false;
+  }
+});
+
+// ============================================================
+// APPLY COLOURS
+// ============================================================
+function applyColours() {
+  clearMessage();
+
+  if (!originalSVGText) {
+    showMessage('info', 'Please upload an SVG file first.');
+    return;
+  }
+
+  const values = colourConfig.map(({ input }) => input.value.trim());
+  const states = values.map(v => isValidHex(v));
+
+  // Check for invalid hex
+  const names = ['Primary', 'Secondary', 'Tertiary'];
+  for (let i = 0; i < 3; i++) {
+    if (states[i] === 'invalid') {
+      showMessage('error', `${names[i]} colour is invalid. Please enter a valid hex code (e.g. #3F5F64).`);
+      return;
+    }
+  }
+
+  // All blank check
+  if (states.every(s => s === 'empty')) {
+    showMessage('error', 'At least one colour must be specified. Leave fields blank only to keep the original colour.');
+    return;
+  }
+
+  // Apply replacements matching the R code logic
+  let svg = originalSVGText;
+
+  if (states[0] === 'valid') {
+    svg = svg.replace(/#2C5234/gi, values[0]);
+  }
+  if (states[1] === 'valid') {
+    svg = svg.replace(/#f5f5f5/gi, values[1]);
+  }
+  if (states[2] === 'valid') {
+    svg = svg.replace(/#e6e6e6/gi, values[2]);
+  }
+
+  modifiedSVGText = svg;
+
+  // Render modified preview
+  modifiedPane.innerHTML = '';
+  renderSVGPreview(modifiedPane, modifiedSVGText);
+
+  const info = document.createElement('div');
+  info.className = 'file-info';
+  const baseName = fileName.replace(/\.svg$/i, '');
+  info.innerHTML = `<iconify-icon icon="lucide:paintbrush" width="13"></iconify-icon> ${baseName}_modified.svg`;
+  modifiedPane.appendChild(info);
+
+  downloadBtn.disabled = false;
+  saveBtn.disabled = false;
+
+  const changes = [];
+  if (states[0] === 'valid') changes.push('primary');
+  if (states[1] === 'valid') changes.push('secondary');
+  if (states[2] === 'valid') changes.push('tertiary');
+
+  showMessage('success', `Colours updated (${changes.join(', ')}). Download or save the modified SVG.`);
+}
+
+// ============================================================
+// DOWNLOAD / SAVE
+// ============================================================
+function downloadFile() {
+  if (!modifiedSVGText) return;
+  const baseName = fileName.replace(/\.svg$/i, '');
+  const blob = new Blob([modifiedSVGText], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${baseName}_modified.svg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('File downloaded');
+}
+
+async function saveAsFile() {
+  if (!modifiedSVGText) return;
+  const baseName = fileName.replace(/\.svg$/i, '');
+
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: `${baseName}_modified.svg`,
+        types: [{
+          description: 'SVG File',
+          accept: { 'image/svg+xml': ['.svg'] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(modifiedSVGText);
+      await writable.close();
+      showToast('File saved');
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+    }
+  }
+
+  downloadFile();
+}
+
+// ============================================================
+// CLEAR / RESET
+// ============================================================
+function clearAll() {
+  originalSVGText = null;
+  modifiedSVGText = null;
+  fileInput.value = '';
+
+  originalPane.innerHTML = '';
+  const dz = document.createElement('div');
+  dz.className = 'drop-zone';
+  dz.id = 'dropZone';
+  dz.innerHTML = `
+    <iconify-icon icon="lucide:upload-cloud" width="40" class="drop-icon"></iconify-icon>
+    <div class="drop-title">Drop your SVG file here</div>
+    <div class="drop-subtitle">or click to browse — SVG files only</div>
+  `;
+  dz.addEventListener('click', () => fileInput.click());
+  dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => { dz.classList.remove('drag-over'); });
+  dz.addEventListener('drop', (e) => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+  originalPane.appendChild(dz);
+
+  modifiedPane.innerHTML = '';
+  const ph = document.createElement('div');
+  ph.className = 'placeholder-msg';
+  ph.id = 'modifiedPlaceholder';
+  ph.innerHTML = `
+    <iconify-icon icon="lucide:arrow-left" width="32"></iconify-icon>
+    <span>Press <span class="shift-key" id="shiftKeyHint">⇧ Shift</span> to apply colours</span>
+  `;
+  modifiedPane.appendChild(ph);
+
+  downloadBtn.disabled = true;
+  saveBtn.disabled = true;
+  clearBtn.disabled = true;
+
+  clearMessage();
+}
+
+function resetPage() {
+  clearAll();
+  colourConfig.forEach(({ key, input, picker, swatch, wrap }) => {
+    input.value = '';
+    picker.value = DEFAULTS[key].toLowerCase();
+    swatch.style.background = DEFAULTS[key];
+    wrap.classList.remove('valid', 'invalid');
+  });
+  showToast('Page reset');
+}
+
+// ============================================================
+// MESSAGES
+// ============================================================
+function showMessage(type, text) {
+  const icons = { error: 'lucide:circle-x', success: 'lucide:circle-check', info: 'lucide:info' };
+  msgArea.innerHTML = `
+    <div class="msg-box ${type}">
+      <iconify-icon icon="${icons[type]}" width="16"></iconify-icon>
+      ${text}
+    </div>
+  `;
+}
+
+function clearMessage() {
+  msgArea.innerHTML = '';
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  el.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('visible'), 2200);
+}
+</script>
+</body>
+</html>
