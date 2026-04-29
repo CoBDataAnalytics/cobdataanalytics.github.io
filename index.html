@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data & Analytics Internal Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        boro: {
+                            teal: '#006B6B',
+                            'teal-dark': '#004D4D',
+                            'teal-light': '#008F8F',
+                            'teal-50': '#E6F5F5',
+                            'teal-100': '#B3E0E0',
+                            dark: '#1A1A1A',
+                            medium: '#555555',
+                            light: '#777777',
+                            muted: '#999999',
+                            border: '#DEE2E6',
+                            'bg-light': '#F7F8F9',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::selection {
+            background: #006B6B;
+            color: #fff;
+        }
+        .card-hover {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+        .card-hover:hover .card-image {
+            transform: scale(1.05);
+        }
+        .card-hover:hover .card-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .card-image {
+            transition: transform 0.4s ease;
+        }
+        .card-arrow {
+            opacity: 0;
+            transform: translateX(-6px);
+            transition: all 0.25s ease;
+        }
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+        .filter-btn.active {
+            background: #006B6B;
+            color: #fff;
+            border-color: #006B6B;
+        }
+        .filter-btn:not(.active):hover {
+            background: #E6F5F5;
+            border-color: #008F8F;
+            color: #006B6B;
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #fff;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .mobile-menu.open {
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body class="bg-white font-sans text-boro-dark antialiased">
+
+    <!-- Navigation -->
+    <nav class="bg-boro-teal sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center">
+                        <div class="nav-logo-icon"><img src="technical/sql-formatter/img/logo.png" alt="Logo"></div>
+                    </div>
+                    <div>
+                        <span class="text-white font-semibold text-lg leading-tight block">Data & Analytics Internal Hub</span>
+                        <span class="text-boro-teal-100 text-[10px] uppercase tracking-widest">Team Portal</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#" class="nav-link text-white text-sm font-medium">Home</a>
+                    <a href="#projects" class="nav-link text-boro-teal-100 text-sm font-medium hover:text-white transition-colors">Projects</a>
+                    <a href="#categories" class="nav-link text-boro-teal-100 text-sm font-medium hover:text-white transition-colors">Categories</a>
+                    <a href="#footer" class="nav-link text-boro-teal-100 text-sm font-medium hover:text-white transition-colors">Contact</a>
+                </div>
+                <button id="mobileToggle" class="md:hidden text-white p-2">
+                    <iconify-icon icon="lucide:menu" width="22"></iconify-icon>
+                </button>
+            </div>
+            <div id="mobileMenu" class="mobile-menu md:hidden">
+                <div class="pb-4 flex flex-col gap-3">
+                    <a href="#" class="text-white text-sm font-medium py-1">Home</a>
+                    <a href="#projects" class="text-boro-teal-100 text-sm font-medium py-1 hover:text-white">Projects</a>
+                    <a href="#categories" class="text-boro-teal-100 text-sm font-medium py-1 hover:text-white">Categories</a>
+                    <a href="#footer" class="text-boro-teal-100 text-sm font-medium py-1 hover:text-white">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-boro-teal-50 via-white to-boro-teal-50 border-b border-boro-border">
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-2 bg-boro-teal-50 border border-boro-teal-100 text-boro-teal text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+                    <iconify-icon icon="lucide:sparkles" width="14"></iconify-icon>
+                    Internal Project Portal
+                </div>
+                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-boro-dark leading-[1.1] tracking-tight mb-6">
+                    Our Projects<br>
+                    <span class="text-boro-teal">Hub</span>
+                </h1>
+                <p class="text-boro-medium text-base sm:text-lg leading-relaxed max-w-2xl mb-8">
+                    A centralised space to develop and deploy internal tools which can aid our work and speed up processes.  
+                    Browse by category to discover the latest initiatives in technology, processes, and technical 
+                    improvements that are shaping how we work.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#projects" class="inline-flex items-center gap-2 bg-boro-teal text-white font-medium text-sm px-6 py-3 rounded-lg hover:bg-boro-teal-dark transition-colors shadow-sm">
+                        Browse Projects
+                        <iconify-icon icon="lucide:arrow-down" width="16"></iconify-icon>
+                    </a>
+                    <a href="#categories" class="inline-flex items-center gap-2 bg-white text-boro-teal font-medium text-sm px-6 py-3 rounded-lg border border-boro-teal hover:bg-boro-teal-50 transition-colors">
+                        View Categories
+                    </a>
+                </div>
+            </div>
+            <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl">
+                <div>
+                    <div class="text-3xl font-bold text-boro-teal">1</div>
+                    <div class="text-xs text-boro-muted uppercase tracking-wider mt-1">Active Projects</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-boro-teal">3</div>
+                    <div class="text-xs text-boro-muted uppercase tracking-wider mt-1">Categories</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-boro-teal">4</div>
+                    <div class="text-xs text-boro-muted uppercase tracking-wider mt-1">Team Members</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-boro-teal">2026</div>
+                    <div class="text-xs text-boro-muted uppercase tracking-wider mt-1">Current Year</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Filters + Projects -->
+    <section id="projects" class="bg-boro-bg-light">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+            <div class="text-center mb-10">
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-boro-dark tracking-tight mb-3">Explore Projects</h2>
+                <p class="text-boro-medium text-sm sm:text-base max-w-xl mx-auto">Filter by category to find the projects most relevant to your area of interest.</p>
+            </div>
+
+            <div id="categories" class="flex flex-wrap justify-center gap-3 mb-12">
+                <button class="filter-btn active text-sm font-medium px-5 py-2.5 rounded-full border border-boro-border" data-filter="all">
+                    <span class="flex items-center gap-2">
+                        <iconify-icon icon="lucide:grid-3x3" width="15"></iconify-icon>
+                        All Projects
+                    </span>
+                </button>
+                <button class="filter-btn text-sm font-medium px-5 py-2.5 rounded-full border border-boro-border text-boro-medium" data-filter="technology">
+                    <span class="flex items-center gap-2">
+                        <iconify-icon icon="lucide:cpu" width="15"></iconify-icon>
+                        Technology
+                    </span>
+                </button>
+                <button class="filter-btn text-sm font-medium px-5 py-2.5 rounded-full border border-boro-border text-boro-medium" data-filter="processes">
+                    <span class="flex items-center gap-2">
+                        <iconify-icon icon="lucide:git-branch" width="15"></iconify-icon>
+                        Processes
+                    </span>
+                </button>
+                <button class="filter-btn text-sm font-medium px-5 py-2.5 rounded-full border border-boro-border text-boro-medium" data-filter="technical">
+                    <span class="flex items-center gap-2">
+                        <iconify-icon icon="lucide:wrench" width="15"></iconify-icon>
+                        Technical
+                    </span>
+                </button>
+            </div>
+
+            <div class="mb-6">
+                <span id="projectCount" class="text-sm text-boro-muted">Showing 1 projects</span>
+            </div>
+
+            <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+
+            <div id="emptyState" class="hidden text-center py-20">
+                <iconify-icon icon="lucide:search-x" width="48" class="text-boro-border mb-4"></iconify-icon>
+                <p class="text-boro-muted">No projects found in this category.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer" class="bg-boro-dark text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+            <div class="max-w-2xl">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-9 h-9 bg-boro-teal rounded-lg flex items-center justify-center">
+                        <div class="nav-logo-icon"><img src="technical/sql-formatter/img/logo.png" alt="Logo"></div>
+                    </div>
+                    <span class="font-semibold text-lg">Data Analytics & Insights Hub</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Need help or have questions?</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    If you need assistance accessing project information, have feedback about this portal, 
+                    or want to enquire about a specific project, please reach out to the data analytics and insights team.
+                </p>
+            </div>
+            <div class="border-t border-gray-700 mt-10 pt-8">
+                <p class="text-gray-500 text-xs">&copy; 2026 Data Analytics & Insights Internal Projects Hub</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const projects = [
+            {
+                id: 1,
+                title: "Cloud Migration Initiative",
+                category: "technical",
+                date: "29 April 2026",
+                developer: "Jeffrey Jose",
+                image: "technical/sql-formatter/img/sql_formatter_thumbnail.png",
+                summary: "A SQL code formatting tool designed to enforce consistent coding standards across projects. The application automatically formats queries according to predefined best practices, while also identifying deviations from standard structure. It highlights formatting errors and surfaces warnings to help developers maintain readability, consistency, and quality in their SQL code.",
+                status: "Complete",
+                link: "technical/sql-formatter/SQL Formatter.html"
+            }
+        ];
+
+        const categoryConfig = {
+            technology: { label: "Technology", color: "bg-blue-50 text-blue-700 border-blue-200", icon: "lucide:cpu" },
+            processes: { label: "Processes", color: "bg-amber-50 text-amber-700 border-amber-200", icon: "lucide:git-branch" },
+            technical: { label: "Technical", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "lucide:wrench" }
+        };
+
+        const statusConfig = {
+            "In Progress": "bg-boro-teal-50 text-boro-teal border-boro-teal-100",
+            "Planning": "bg-amber-50 text-amber-700 border-amber-200",
+            "Complete": "bg-emerald-50 text-emerald-700 border-emerald-200"
+        };
+
+        function renderCards(filter = 'all') {
+            const grid = document.getElementById('cardsGrid');
+            const empty = document.getElementById('emptyState');
+            const count = document.getElementById('projectCount');
+            const filtered = filter === 'all' ? projects : projects.filter(p => p.category === filter);
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                empty.classList.remove('hidden');
+                count.textContent = 'No projects found';
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            empty.classList.add('hidden');
+            count.textContent = `Showing ${filtered.length} project${filtered.length !== 1 ? 's' : ''}`;
+
+            grid.innerHTML = filtered.map(project => {
+                const cat = categoryConfig[project.category];
+                const initials = project.developer.split(' ').map(n => n[0]).join('');
+                return `
+                    <a href="${project.link}" class="card-hover block bg-white rounded-xl border border-boro-border overflow-hidden group no-underline">
+                        <div class="relative overflow-hidden aspect-[3/2]">
+                            <img src="${project.image}" alt="${project.title}" 
+                                 class="card-image w-full h-full object-cover" loading="lazy">
+                            <div class="absolute top-3 left-3">
+                                <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${cat.color}">
+                                    <iconify-icon icon="${cat.icon}" width="12"></iconify-icon>
+                                    ${cat.label}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="text-[11px] text-boro-muted font-medium uppercase tracking-wider flex items-center gap-1.5">
+                                    <iconify-icon icon="lucide:calendar" width="12"></iconify-icon>
+                                    ${project.date}
+                                </span>
+                                <span class="w-px h-3 bg-boro-border"></span>
+                                <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${statusConfig[project.status]}">${project.status}</span>
+                            </div>
+                            <h3 class="font-semibold text-boro-dark text-lg leading-snug mb-2 group-hover:text-boro-teal transition-colors">
+                                ${project.title}
+                            </h3>
+                            <p class="text-boro-light text-sm leading-relaxed mb-4">${project.summary}</p>
+                            <div class="flex items-center justify-between pt-4 border-t border-boro-border">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 bg-boro-teal text-white rounded-full flex items-center justify-center text-[10px] font-bold">${initials}</span>
+                                    <span class="text-sm text-boro-medium font-medium">${project.developer}</span>
+                                </div>
+                                <span class="card-arrow text-boro-teal flex items-center gap-1 text-xs font-medium">
+                                    View
+                                    <iconify-icon icon="lucide:arrow-right" width="14"></iconify-icon>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderCards(btn.dataset.filter);
+            });
+        });
+
+        document.getElementById('mobileToggle').addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.toggle('open');
+        });
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobileMenu').classList.remove('open');
+            });
+        });
+
+        renderCards();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAI SQL Formatter</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        boro: {
+          teal: '#006B6B',
+          'teal-dark': '#004D4D',
+          'teal-light': '#008F8F',
+          'teal-50': '#E6F5F5',
+          'teal-100': '#B3E0E0',
+          dark: '#1A1A1A',
+          medium: '#555555',
+          light: '#777777',
+          muted: '#999999',
+          border: '#DEE2E6',
+          'bg-light': '#F7F8F9',
+        }
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Playfair Display', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F7F8F9;
+    color: #1A1A1A;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  ::selection { background: #006B6B; color: #fff; }
+
+  .app { position: relative; z-index: 1; max-width: 1440px; margin: 0 auto; padding: 1.2rem 1.5rem 2rem; }
+
+  /* Top bar */
+  .top-bar {
+    background: #004D4D;
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 0.4rem 0;
+  }
+  .top-bar-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Nav */
+  .app-nav {
+    background: #006B6B;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .app-nav-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 0.6rem; }
+  .nav-logo-icon {
+    width: 34px; height: 34px; background: #fff; border-radius: 8px;
+    display: grid; place-items: center; overflow: hidden;
+  }
+  .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .nav-logo-text { color: #fff; font-weight: 600; font-size: 0.95rem; }
+  .nav-logo-sub { color: #B3E0E0; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .nav-back {
+    display: flex; align-items: center; gap: 0.4rem;
+    color: #B3E0E0; font-size: 0.8rem; font-weight: 500;
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-back:hover { color: #fff; }
+
+  /* Header */
+  .app-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 0 0.8rem; flex-wrap: wrap; gap: 0.6rem;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.65rem; font-weight: 700; color: #1A1A1A;
+    letter-spacing: -0.02em;
+  }
+  .header-subtitle {
+    font-size: 0.8rem; color: #999999; margin-top: 0.2rem;
+  }
+
+  /* Settings bar */
+  .settings-bar {
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    padding: 0.65rem 1rem; background: #fff;
+    border: 1px solid #DEE2E6; border-radius: 10px;
+    margin-bottom: 1rem;
+  }
+  .settings-bar label {
+    font-size: 0.78rem; color: #777777; font-weight: 500;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .settings-bar input {
+    background: #F7F8F9; border: 1px solid #DEE2E6;
+    border-radius: 6px; padding: 0.4rem 0.65rem; color: #1A1A1A;
+    font-family: 'Inter', sans-serif; font-size: 0.82rem;
+    outline: none; transition: border-color 0.2s; width: 200px;
+  }
+  .settings-bar input:focus { border-color: #006B6B; box-shadow: 0 0 0 2px rgba(0,107,107,0.1); }
+  .settings-bar input::placeholder { color: #999999; }
+
+  /* Split pane */
+  .split-pane {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1rem; margin-bottom: 1rem;
+  }
+  @media (max-width: 800px) { .split-pane { grid-template-columns: 1fr; } }
+
+  .pane {
+    display: flex; flex-direction: column;
+    background: #fff; border: 1px solid #DEE2E6;
+    border-radius: 12px; overflow: hidden; min-height: 420px;
+    transition: border-color 0.2s;
+  }
+  .pane:focus-within { border-color: #006B6B; box-shadow: 0 0 0 2px rgba(0,107,107,0.08); }
+  .pane-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.6rem 1rem; background: #F7F8F9;
+    border-bottom: 1px solid #DEE2E6;
+    font-size: 0.75rem; font-weight: 600; color: #555555;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .pane-header .actions { display: flex; gap: 0.4rem; }
+  .pane-header button {
+    background: #fff; border: 1px solid #DEE2E6;
+    border-radius: 6px; color: #777777; padding: 0.3rem 0.6rem;
+    font-size: 0.72rem; cursor: pointer; transition: all 0.2s;
+    font-family: inherit; display: flex; align-items: center; gap: 0.3rem;
+  }
+  .pane-header button:hover { color: #006B6B; border-color: #006B6B; background: #E6F5F5; }
+
+  /* Textarea */
+  .code-input {
+    flex: 1; resize: none; background: #fff; color: #1A1A1A;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+    line-height: 1.65; padding: 1rem; border: none; outline: none;
+    tab-size: 2;
+  }
+  .code-input::placeholder { color: #999999; }
+  .code-input::-webkit-scrollbar { width: 8px; }
+  .code-input::-webkit-scrollbar-track { background: transparent; }
+  .code-input::-webkit-scrollbar-thumb { background: #DEE2E6; border-radius: 4px; }
+  .code-input::-webkit-scrollbar-thumb:hover { background: #B3E0E0; }
+
+  /* Output area */
+  .code-output-wrap {
+    flex: 1; overflow: auto; background: #fff;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+    line-height: 1.65; position: relative;
+  }
+  .code-output-wrap::-webkit-scrollbar { width: 8px; }
+  .code-output-wrap::-webkit-scrollbar-track { background: transparent; }
+  .code-output-wrap::-webkit-scrollbar-thumb { background: #DEE2E6; border-radius: 4px; }
+  .code-output-wrap::-webkit-scrollbar-thumb:hover { background: #B3E0E0; }
+  .code-output { padding: 1rem; white-space: pre; min-height: 100%; }
+  .code-output .placeholder-msg {
+    color: #999999; font-style: italic; display: flex;
+    align-items: center; gap: 0.5rem; padding: 2rem;
+    font-family: 'Inter', sans-serif;
+  }
+  .line-numbers {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    padding: 1rem 0; width: 44px; text-align: right;
+    color: #999999; font-size: 0.72rem; line-height: 1.65;
+    border-right: 1px solid #DEE2E6;
+    user-select: none; pointer-events: none;
+    background: #F7F8F9;
+  }
+  .line-numbers span { display: block; padding-right: 10px; }
+  .code-output.has-lines { padding-left: 54px; }
+
+  /* Syntax highlighting — light theme */
+  .sql-kw { color: #006B6B; font-weight: 600; }
+  .sql-str { color: #16a34a; }
+  .sql-num { color: #2563eb; }
+  .sql-cmt { color: #999999; font-style: italic; }
+  .sql-fn { color: #7c3aed; }
+
+  /* Action bar */
+  .action-bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap;
+  }
+  .btn-format {
+    position: relative; padding: 0.7rem 2.4rem;
+    background: #006B6B; color: #fff; border: none; border-radius: 10px;
+    font-family: inherit; font-size: 0.92rem; font-weight: 600;
+    cursor: pointer; letter-spacing: -0.01em;
+    transition: all 0.25s; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,107,107,0.2);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-format:hover { background: #004D4D; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,107,107,0.3); }
+  .btn-format:active { transform: translateY(0); }
+  .btn-format .shimmer {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+    transform: translateX(-100%);
+  }
+  .btn-format:hover .shimmer { animation: shimmer 0.8s ease forwards; }
+  @keyframes shimmer { to { transform: translateX(100%); } }
+
+  .btn-secondary {
+    padding: 0.6rem 1.3rem; background: #fff;
+    color: #555555; border: 1px solid #DEE2E6;
+    border-radius: 10px; font-family: inherit; font-size: 0.85rem;
+    font-weight: 500; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .btn-secondary:hover { background: #E6F5F5; border-color: #008F8F; color: #006B6B; }
+
+  /* Lint results */
+  .lint-section { display: flex; flex-direction: column; gap: 0.75rem; }
+  .lint-box {
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid; animation: fadeSlideUp 0.35s ease;
+    background: #fff;
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .lint-box.errors { border-color: #fca5a5; }
+  .lint-box.warnings { border-color: #fcd34d; }
+  .lint-box-header {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.65rem 1rem; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; user-select: none; transition: background 0.2s;
+  }
+  .lint-box.errors .lint-box-header { color: #dc2626; background: #fef2f2; }
+  .lint-box.warnings .lint-box-header { color: #d97706; background: #fffbeb; }
+  .lint-box-header:hover { filter: brightness(0.97); }
+  .lint-box-header .count {
+    background: currentColor; color: #fff;
+    padding: 0.05rem 0.45rem; border-radius: 4px;
+    font-size: 0.72rem; font-weight: 700;
+  }
+  .lint-box-header .chevron { margin-left: auto; transition: transform 0.2s; font-size: 0.7rem; }
+  .lint-box.collapsed .chevron { transform: rotate(-90deg); }
+  .lint-box.collapsed .lint-box-body { display: none; }
+  .lint-box-body { padding: 0 1rem 0.75rem; }
+  .lint-item {
+    display: flex; align-items: flex-start; gap: 0.6rem;
+    padding: 0.45rem 0; font-size: 0.82rem; line-height: 1.45;
+    border-bottom: 1px solid #F7F8F9;
+  }
+  .lint-item:last-child { border-bottom: none; }
+  .lint-item .rule-tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    padding: 0.15rem 0.45rem; border-radius: 4px;
+    white-space: nowrap; font-weight: 500; flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .lint-box.errors .rule-tag { background: #fef2f2; color: #dc2626; }
+  .lint-box.warnings .rule-tag { background: #fffbeb; color: #d97706; }
+  .lint-item .msg { color: #555555; }
+
+  /* Success */
+  .success-msg {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.75rem 1rem; background: #f0fdf4;
+    border: 1px solid #bbf7d0; border-radius: 10px;
+    color: #16a34a; font-size: 0.85rem; font-weight: 500;
+    animation: fadeSlideUp 0.35s ease;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100;
+    padding: 0.6rem 1.2rem; background: #1A1A1A;
+    border-radius: 8px; color: #fff; font-size: 0.82rem; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    transform: translateY(20px); opacity: 0;
+    transition: all 0.3s ease; pointer-events: none;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .toast.visible { transform: translateY(0); opacity: 1; }
+
+  /* Header badge */
+  .header-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 0.68rem; color: #006B6B; font-weight: 600;
+    padding: 0.15rem 0.5rem; background: #E6F5F5;
+    border-radius: 4px; margin-left: 0.5rem;
+    border: 1px solid #B3E0E0;
+  }
+
+  /* Entrance */
+  .app > * { animation: fadeIn 0.5s ease both; }
+  .app > *:nth-child(2) { animation-delay: 0.04s; }
+  .app > *:nth-child(3) { animation-delay: 0.08s; }
+  .app > *:nth-child(4) { animation-delay: 0.12s; }
+  .app > *:nth-child(5) { animation-delay: 0.16s; }
+  .app > *:nth-child(6) { animation-delay: 0.2s; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Keyboard hint */
+  .kbd-hint {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 0.7rem; color: #999999; margin-top: 0.3rem;
+  }
+  .kbd-hint kbd {
+    background: #F7F8F9; border: 1px solid #DEE2E6;
+    border-radius: 4px; padding: 0.05rem 0.35rem;
+    font-family: 'Inter', sans-serif; font-size: 0.65rem;
+    font-weight: 500; color: #555555;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <iconify-icon icon="lucide:database" width="11"></iconify-icon>
+    Data Analytics & Insights Tool
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav class="app-nav">
+  <div class="app-nav-inner">
+    <div class="nav-logo">
+      <div class="nav-logo-icon"><img src="img/logo.png" alt="Logo"></div>
+      <div>
+        <div class="nav-logo-text">SQL Formatter</div>
+        <div class="nav-logo-sub">DATA ANALYTICS & INSIGHTS</div>
+      </div>
+    </div>
+    <a href="../../index.html" class="nav-back">
+      <iconify-icon icon="lucide:arrow-left" width="15"></iconify-icon>
+      Back to Projects
+    </a>
+  </div>
+</nav>
+
+<div class="app">
+  <!-- Header -->
+  <header class="app-header">
+    <div>
+      <h1 class="header-title">SQL Formatter</h1>
+      <p class="header-subtitle">For questions, please contact the Data Analytics & Insights Team</p>
+      <div class="kbd-hint">
+        <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to format
+      </div>
+    </div>
+  </header>
+
+  <!-- Settings -->
+  <div class="settings-bar">
+    <label>
+      <iconify-icon icon="lucide:user" width="14" style="color:#999999"></iconify-icon>
+      Developer
+      <input type="text" id="devInput" placeholder="UNKNOWN">
+    </label>
+    <label>
+      <iconify-icon icon="lucide:target" width="14" style="color:#999999"></iconify-icon>
+      Purpose
+      <input type="text" id="purposeInput" placeholder="TODO: Describe purpose">
+    </label>
+  </div>
+
+  <!-- Split Pane -->
+  <div class="split-pane">
+    <!-- Input -->
+    <div class="pane" id="inputPane">
+      <div class="pane-header">
+        <span>
+          <iconify-icon icon="lucide:pencil-line" width="13" style="margin-right:0.3rem;vertical-align:-2px"></iconify-icon>
+          Input
+        </span>
+        <div class="actions">
+          <button onclick="loadSample()" title="Load sample SQL">
+            <iconify-icon icon="lucide:flask-conical" width="12"></iconify-icon> Sample
+          </button>
+          <button onclick="clearAll()" title="Clear input">
+            <iconify-icon icon="lucide:x" width="12"></iconify-icon> Clear
+          </button>
+        </div>
+      </div>
+      <textarea class="code-input" id="codeInput" placeholder="Paste your SQL here..." spellcheck="false"></textarea>
+    </div>
+
+    <!-- Output -->
+    <div class="pane" id="outputPane">
+      <div class="pane-header">
+        <span>
+          <iconify-icon icon="lucide:code-2" width="13" style="margin-right:0.3rem;vertical-align:-2px"></iconify-icon>
+          Output
+          <span id="headerBadge" class="header-badge" style="display:none">
+            <iconify-icon icon="lucide:file-text" width="11"></iconify-icon> Header added
+          </span>
+        </span>
+        <div class="actions">
+          <button onclick="copyOutput()" title="Copy to clipboard">
+            <iconify-icon icon="lucide:copy" width="12"></iconify-icon> Copy
+          </button>
+        </div>
+      </div>
+      <div class="code-output-wrap" id="outputWrap">
+        <div class="code-output" id="codeOutput">
+          <div class="placeholder-msg">
+            <iconify-icon icon="lucide:arrow-left" width="16"></iconify-icon>
+            Formatted SQL will appear here
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <button class="btn-format" onclick="formatSQLAction()" aria-label="Format SQL">
+      <span class="shimmer"></span>
+      <iconify-icon icon="lucide:sparkles" width="16"></iconify-icon>
+      Format SQL
+    </button>
+    <button class="btn-secondary" onclick="clearAll()">
+      <iconify-icon icon="lucide:rotate-ccw" width="14"></iconify-icon> Reset
+    </button>
+    <button class="btn-secondary" onclick="loadSample()">
+      <iconify-icon icon="lucide:flask-conical" width="14"></iconify-icon> Load Sample
+    </button>
+  </div>
+
+  <!-- Lint Results -->
+  <section class="lint-section" id="lintResults" aria-label="Lint results"></section>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <iconify-icon icon="lucide:check-circle" width="15" style="color:#16a34a"></iconify-icon>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ============================================================
+// SQL KEYWORDS & CONFIG
+// ============================================================
+const INDENT = '  ';
+
+const SQL_KEYWORDS = new Set([
+  'SELECT','FROM','WHERE','JOIN','LEFT','RIGHT','INNER','OUTER','FULL','CROSS',
+  'ON','AND','OR','NOT','IN','EXISTS','BETWEEN','LIKE','IS','NULL','GROUP','BY',
+  'ORDER','HAVING','LIMIT','OFFSET','UNION','ALL','INTERSECT','EXCEPT','INSERT',
+  'INTO','VALUES','UPDATE','SET','DELETE','CREATE','TABLE','ALTER','DROP','INDEX',
+  'VIEW','AS','CASE','WHEN','THEN','ELSE','END','WITH','RECURSIVE','DISTINCT',
+  'ASC','DESC','OVER','PARTITION','WINDOW','ROWS','RANGE','FETCH','NEXT','PRIOR',
+  'FIRST','LAST','ONLY','MERGE','USING','MATCHED','TOP','PERCENT','NOLOCK',
+  'IF','BEGIN','COMMIT','ROLLBACK','RETURN','DECLARE','TRUNCATE','EXPLAIN',
+  'GRANT','REVOKE','SCHEMA','DATABASE','FUNCTION','PROCEDURE','TRIGGER','SEQUENCE',
+  'CONSTRAINT','PRIMARY','FOREIGN','KEY','REFERENCES','CHECK','DEFAULT','UNIQUE',
+  'VARCHAR','INT','INTEGER','BIGINT','SMALLINT','FLOAT','DOUBLE','DECIMAL','NUMERIC',
+  'BOOLEAN','DATE','TIMESTAMP','CHAR','TEXT','SERIAL','IDENTITY','NVARCHAR','NCHAR',
+  'BIT','TINYINT','REAL','MONEY','SMALLMONEY','DATETIME','DATETIME2','TIME',
+  'OFFSET','FETCH','CURSOR','OPEN','CLOSE','DEALLOCATE','WHILE','BREAK','CONTINUE',
+  'GOTO','WAITFOR','DELAY','TRY','CATCH','THROW','RAISERROR','PRINT','EXEC','EXECUTE'
+]);
+
+const SQL_FUNCTIONS = new Set([
+  'COUNT','SUM','AVG','MIN','MAX','COALESCE','NULLIF','ISNULL','CAST','CONVERT',
+  'ROUND','FLOOR','CEILING','ABS','POWER','SQRT','LOG','LEN','LENGTH','SUBSTRING',
+  'LEFT','RIGHT','TRIM','LTRIM','RTRIM','UPPER','LOWER','REPLACE','TRANSLATE',
+  'CONCAT','REPLICATE','SPACE','STUFF','CHARINDEX','PATINDEX','REVERSE','STRING_AGG',
+  'ROW_NUMBER','RANK','DENSE_RANK','NTILE','LAG','LEAD','FIRST_VALUE','LAST_VALUE',
+  'GETDATE','GETUTCDATE','DATEADD','DATEDIFF','DATEPART','DATENAME','YEAR','MONTH',
+  'DAY','EOMONTH','NEWID','ISNUMERIC','ISDATE','IIF','CHOOSE','FORMAT','TRY_CAST',
+  'TRY_CONVERT','OBJECT_ID','SCOPE_IDENTITY','@@IDENTITY','@@ROWCOUNT','NEXT VALUE'
+]);
+
+const MULTI_WORD_MAP = {
+  'GROUP':'BY','ORDER':'BY','INSERT':'INTO',
+  'LEFT':'JOIN','RIGHT':'JOIN','INNER':'JOIN','OUTER':'JOIN','FULL':'JOIN','CROSS':'JOIN',
+  'NOT':'NULL','PRIMARY':'KEY','FOREIGN':'KEY','UNION':'ALL',
+  'CREATE':'TABLE','DROP':'TABLE','ALTER':'TABLE','CREATE':'INDEX','DROP':'INDEX',
+  'CREATE':'VIEW','DROP':'VIEW','IS':'NOT','ORDER':'BY','GROUP':'BY',
+  'LEFT':'OUTER','RIGHT':'OUTER','FULL':'OUTER'
+};
+
+const THREE_WORD = [
+  ['LEFT','OUTER','JOIN'],['RIGHT','OUTER','JOIN'],['FULL','OUTER','JOIN'],
+  ['IS','NOT','NULL']
+];
+
+// ============================================================
+// TOKENIZER
+// ============================================================
+function tokenize(sql) {
+  const tokens = [];
+  let i = 0;
+  while (i < sql.length) {
+    if (/\s/.test(sql[i])) {
+      let ws = '';
+      while (i < sql.length && /\s/.test(sql[i])) ws += sql[i++];
+      tokens.push({ type: 'ws', value: ws });
+      continue;
+    }
+    if (sql[i] === '-' && sql[i+1] === '-') {
+      let c = '';
+      while (i < sql.length && sql[i] !== '\n') c += sql[i++];
+      tokens.push({ type: 'comment', value: c });
+      continue;
+    }
+    if (sql[i] === '/' && sql[i+1] === '*') {
+      let c = '/*';
+      i += 2;
+      while (i < sql.length - 1 && !(sql[i] === '*' && sql[i+1] === '/')) c += sql[i++];
+      if (i < sql.length - 1) { c += '*/'; i += 2; }
+      else { c += sql[i]; i++; }
+      tokens.push({ type: 'comment', value: c });
+      continue;
+    }
+    if (sql[i] === "'") {
+      let s = "'";
+      i++;
+      while (i < sql.length) {
+        if (sql[i] === "'" && sql[i+1] === "'") { s += "''"; i += 2; }
+        else if (sql[i] === "'") { s += "'"; i++; break; }
+        else { s += sql[i++]; }
+      }
+      tokens.push({ type: 'string', value: s });
+      continue;
+    }
+    if (sql[i] === '"') {
+      let s = '"';
+      i++;
+      while (i < sql.length && sql[i] !== '"') { if (sql[i]==='\\') s+=sql[i++]; s+=sql[i++]; }
+      if (i < sql.length) s += sql[i++];
+      tokens.push({ type: 'quoted-id', value: s });
+      continue;
+    }
+    if (sql[i] === '`') {
+      let s = '`';
+      i++;
+      while (i < sql.length && sql[i] !== '`') s += sql[i++];
+      if (i < sql.length) s += sql[i++];
+      tokens.push({ type: 'quoted-id', value: s });
+      continue;
+    }
+    if (sql[i] === '[') {
+      let s = '[';
+      i++;
+      while (i < sql.length && sql[i] !== ']') s += sql[i++];
+      if (i < sql.length) s += sql[i]++;
+      tokens.push({ type: 'quoted-id', value: s });
+      continue;
+    }
+    if (/\d/.test(sql[i]) || (sql[i]==='.' && i+1<sql.length && /\d/.test(sql[i+1]))) {
+      let n = '';
+      while (i < sql.length && /[\d.]/.test(sql[i])) n += sql[i++];
+      if (i < sql.length && (sql[i]==='e'||sql[i]==='E')) {
+        n += sql[i++];
+        if (i < sql.length && (sql[i]==='+'||sql[i]==='-')) n += sql[i++];
+        while (i < sql.length && /\d/.test(sql[i])) n += sql[i++];
+      }
+      tokens.push({ type: 'number', value: n });
+      continue;
+    }
+    if (/[a-zA-Z_#@]/.test(sql[i])) {
+      let w = '';
+      while (i < sql.length && /[a-zA-Z0-9_#@.]/.test(sql[i])) w += sql[i++];
+      const upper = w.toUpperCase();
+      if (SQL_FUNCTIONS.has(upper)) tokens.push({ type: 'function', value: w });
+      else if (SQL_KEYWORDS.has(upper)) tokens.push({ type: 'keyword', value: w });
+      else tokens.push({ type: 'identifier', value: w });
+      continue;
+    }
+    if ('+-*/%=<>!&|^~'.includes(sql[i])) {
+      let op = sql[i++];
+      if (i < sql.length && '=<>'.includes(sql[i])) op += sql[i++];
+      tokens.push({ type: 'operator', value: op });
+      continue;
+    }
+    if ('(),;.'.includes(sql[i])) {
+      tokens.push({ type: 'punct', value: sql[i++] });
+      continue;
+    }
+    tokens.push({ type: 'other', value: sql[i++] });
+  }
+  return tokens;
+}
+
+// ============================================================
+// FORMAT SQL
+// ============================================================
+function formatSQLCode(sql) {
+  const raw = tokenize(sql).filter(t => t.type !== 'ws');
+  const merged = [];
+  let idx = 0;
+  while (idx < raw.length) {
+    const t = raw[idx];
+    if (t.type === 'keyword') {
+      const u = t.value.toUpperCase();
+      let matched3 = false;
+      for (const [a, b, c] of THREE_WORD) {
+        if (u === a && idx+2 < raw.length &&
+            raw[idx+1].type === 'keyword' && raw[idx+1].value.toUpperCase() === b &&
+            raw[idx+2].type === 'keyword' && raw[idx+2].value.toUpperCase() === c) {
+          merged.push({ type: 'keyword', value: a + ' ' + b + ' ' + c });
+          idx += 3; matched3 = true; break;
+        }
+      }
+      if (matched3) continue;
+      if (MULTI_WORD_MAP[u] && idx+1 < raw.length &&
+          raw[idx+1].type === 'keyword' && raw[idx+1].value.toUpperCase() === MULTI_WORD_MAP[u]) {
+        merged.push({ type: 'keyword', value: u + ' ' + MULTI_WORD_MAP[u] });
+        idx += 2; continue;
+      }
+    }
+    merged.push(t);
+    idx++;
+  }
+
+  const topClauses = new Set([
+    'SELECT','FROM','WHERE','GROUP BY','ORDER BY','HAVING','LIMIT','OFFSET',
+    'UNION','UNION ALL','INTERSECT','EXCEPT','INSERT INTO','UPDATE','SET',
+    'DELETE','CREATE TABLE','ALTER TABLE','DROP TABLE','WITH','MERGE','VALUES'
+  ]);
+  const joinClauses = new Set([
+    'JOIN','LEFT JOIN','RIGHT JOIN','INNER JOIN','OUTER JOIN',
+    'FULL JOIN','CROSS JOIN','LEFT OUTER JOIN','RIGHT OUTER JOIN','FULL OUTER JOIN'
+  ]);
+  const subClauses = new Set(['AND','OR','ON','WHEN','ELSE','THEN']);
+  const blockOpen = new Set(['CASE','BEGIN']);
+  const blockClose = new Set(['END']);
+
+  let out = '';
+  let depth = 0;
+  let afterSelect = false;
+  let prev = null;
+
+  function needsSpace(tok) {
+    if (!out.length) return false;
+    const last = out[out.length - 1];
+    if (last === '(' || last === '\n' || last === ' ') return false;
+    if (tok.type === 'punct' && (tok.value === ')' || tok.value === ',' || tok.value === ';' || tok.value === '.')) return false;
+    return true;
+  }
+
+  for (let i = 0; i < merged.length; i++) {
+    const t = merged[i];
+    const isKw = t.type === 'keyword';
+    const upper = isKw ? t.value.toUpperCase() : '';
+    const next = merged[i + 1] || null;
+    const nextU = next && next.type === 'keyword' ? next.value.toUpperCase() : '';
+
+    let nl = false;
+    let extra = 0;
+
+    if (isKw) {
+      if (topClauses.has(upper)) { nl = true; afterSelect = (upper === 'SELECT'); }
+      else if (joinClauses.has(upper)) { nl = true; }
+      else if (blockOpen.has(upper)) { nl = true; }
+      else if (blockClose.has(upper)) {
+        depth = Math.max(0, depth - 1);
+        nl = true;
+      }
+      else if (subClauses.has(upper) && depth > 0) { nl = true; extra = 1; }
+      else if (subClauses.has(upper) && depth === 0 && (upper === 'AND' || upper === 'OR')) {
+        nl = true; extra = 1;
+      }
+    }
+
+    if (t.type === 'punct' && t.value === '(') {
+      if (needsSpace(t)) out += ' ';
+      out += '(';
+      depth++;
+      if (next && next.type === 'keyword' && nextU === 'SELECT') {
+        out += '\n' + INDENT.repeat(depth);
+        afterSelect = true;
+      }
+      prev = t; continue;
+    }
+    if (t.type === 'punct' && t.value === ')') {
+      const wasEmpty = prev && prev.type === 'punct' && prev.value === '(';
+      depth = Math.max(0, depth - 1);
+      if (!wasEmpty) out += '\n' + INDENT.repeat(depth) + ')';
+      else out += ')';
+      prev = t; continue;
+    }
+
+    if (nl && out.trim().length > 0) {
+      out += '\n' + INDENT.repeat(depth + extra);
+    }
+
+    if (!nl && needsSpace(t)) out += ' ';
+
+    if (isKw) out += upper;
+    else if (t.type === 'function') out += t.value.toUpperCase();
+    else out += t.value;
+
+    if (isKw && blockOpen.has(upper)) depth++;
+
+    if (t.value === ',' && afterSelect && depth <= 1) {
+      out += '\n' + INDENT.repeat(depth + 1);
+    }
+
+    prev = t;
+  }
+
+  return out.trim();
+}
+
+// ============================================================
+// HEADER LOGIC
+// ============================================================
+function hasHeaderBlock(sql) {
+  const t = sql.trim();
+  return /^\s*\/\*/.test(t) && /Developer:|Created Date:|Purpose:/i.test(t);
+}
+
+function generateHeader(dev, purpose) {
+  const d = new Date().toISOString().split('T')[0];
+  return `/*\nDeveloper: ${dev}\nCreated Date: ${d}\nPurpose: ${purpose}\n\nVersion History:\n- v1.0 | ${d} | Initial creation\n*/\n`;
+}
+
+function ensureHeader(sql, dev, purpose) {
+  if (hasHeaderBlock(sql)) return { sql, added: false };
+  return { sql: generateHeader(dev, purpose) + sql, added: true };
+}
+
+// ============================================================
+// CUSTOM LINT RULES
+// ============================================================
+function stripStringsAndComments(sql) {
+  return sql
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/--[^\n]*/g, ' ')
+    .replace(/'(?:[^'\\]|\\.)*'/g, "''")
+    .replace(/"(?:[^"\\]|\\.)*"/g, '""')
+    .replace(/`(?:[^`\\]|\\.)*`/g, '``')
+    .replace(/\[[^\]]*\]/g, '[]');
+}
+
+function customLint(sql) {
+  const issues = [];
+  const clean = stripStringsAndComments(sql);
+
+  if (/\bselect\s+\*/i.test(clean)) {
+    issues.push({ type: 'ERROR', rule: 'SELECT *', message: 'Avoid SELECT *. Specify explicit columns.' });
+  }
+
+  const snakeMatches = clean.match(/\b[a-z]+_[a-z0-9_]+\b/g) || [];
+  const seen = new Set();
+  for (const col of snakeMatches) {
+    if (seen.has(col)) continue;
+    seen.add(col);
+    const sug = col.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+    issues.push({ type: 'WARN', rule: 'camelCase', message: `${col} → use ${sug}` });
+  }
+
+  const boolMatches = clean.match(/\b[a-zA-Z]+(?:Flag|Active|Enabled)\b/g) || [];
+  const boolSeen = new Set();
+  for (const col of boolMatches) {
+    if (boolSeen.has(col)) continue;
+    boolSeen.add(col);
+    if (!/^(is|has)/i.test(col)) {
+      issues.push({ type: 'WARN', rule: 'Boolean naming', message: `${col} should start with is/has` });
+    }
+  }
+
+  const pkMatches = clean.match(/\b[a-zA-Z]+Id\b/g) || [];
+  const pkSeen = new Set();
+  for (const col of pkMatches) {
+    if (pkSeen.has(col)) continue;
+    pkSeen.add(col);
+    if (!/^[a-z]+Id$/.test(col)) {
+      issues.push({ type: 'WARN', rule: 'Primary Key naming', message: `${col} should follow <entity>Id` });
+    }
+  }
+
+  const tableMatches = clean.match(/(?:from|join)\s+([a-zA-Z][a-zA-Z0-9_]*)/gi) || [];
+  const tblSeen = new Set();
+  for (const m of tableMatches) {
+    const tbl = m.split(/\s+/)[1];
+    if (tblSeen.has(tbl)) continue;
+    tblSeen.add(tbl);
+    if (SQL_KEYWORDS.has(tbl.toUpperCase())) continue;
+    if (/s$/.test(tbl) && tbl.length > 3 && !/ness$|ss$|us$|is$/.test(tbl)) {
+      issues.push({ type: 'WARN', rule: 'Singular table naming', message: `Table ${tbl} appears plural; use singular` });
+    }
+  }
+
+  const kwLower = clean.match(/\b(select|from|where|join|left|right|inner|outer|full|cross|on|and|or|not|in|group|by|order|having|limit|insert|into|values|update|set|delete|create|table|alter|drop|as|case|when|then|else|end|with|distinct|asc|desc|union|all|is|null)\b/g) || [];
+  const kwSeen = new Set();
+  for (const kw of kwLower) {
+    if (kwSeen.has(kw)) continue;
+    kwSeen.add(kw);
+    if (kw !== kw.toUpperCase()) {
+      issues.push({ type: 'WARN', rule: 'Keyword casing', message: `"${kw}" should be uppercase → ${kw.toUpperCase()}` });
+    }
+  }
+
+  return issues;
+}
+
+// ============================================================
+// SYNTAX HIGHLIGHTING
+// ============================================================
+function highlightSQL(sql) {
+  let h = sql.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  const placeholders = [];
+  h = h.replace(/(\/\*[\s\S]*?\*\/|--[^\n]*|'(?:[^'\\]|\\.)*')/g, (m) => {
+    const i = placeholders.length;
+    placeholders.push(m);
+    return `__PH${i}__`;
+  });
+
+  h = h.replace(/\b(\d+(?:\.\d+)?(?:e[+-]?\d+)?)\b/gi, '<span class="sql-num">$1</span>');
+
+  h = h.replace(/\b(COUNT|SUM|AVG|MIN|MAX|COALESCE|NULLIF|ISNULL|CAST|CONVERT|ROUND|FLOOR|CEILING|ABS|POWER|SQRT|LOG|LEN|LENGTH|SUBSTRING|LEFT|RIGHT|TRIM|LTRIM|RTRIM|UPPER|LOWER|REPLACE|CONCAT|ROW_NUMBER|RANK|DENSE_RANK|NTILE|LAG|LEAD|FIRST_VALUE|LAST_VALUE|GETDATE|DATEADD|DATEDIFF|DATEPART|YEAR|MONTH|DAY|NEWID|ISNUMERIC|IIF|CHOOSE|FORMAT|TRY_CAST|STRING_AGG|OBJECT_ID|SCOPE_IDENTITY|NEXT|VALUE|NVL|DECODE|NVL2|TO_CHAR|TO_DATE|TO_NUMBER|LISTAGG|REGEXP_REPLACE|REGEXP_LIKE|REGEXP_SUBSTR|INSTR|INITCAP|ADD_MONTHS|MONTHS_BETWEEN|TRUNC|SYSDATE|USER|SESSION_USER|CURRENT_USER|CURRENT_DATE|CURRENT_TIMESTAMP|LOCALTIME|LOCALTIMESTAMP|EXTRACT|GENERATE_SERIES|ARRAY_AGG|JSON_EXTRACT|JSON_PARSE|UNNEST)\b/gi,
+    (m) => `<span class="sql-fn">${m}</span>`);
+
+  h = h.replace(/\b(SELECT|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|FULL|CROSS|ON|AND|OR|NOT|IN|EXISTS|BETWEEN|LIKE|IS|NULL|GROUP|BY|ORDER|HAVING|LIMIT|OFFSET|UNION|ALL|INTERSECT|EXCEPT|INSERT|INTO|VALUES|UPDATE|SET|DELETE|CREATE|TABLE|ALTER|DROP|INDEX|VIEW|AS|CASE|WHEN|THEN|ELSE|END|WITH|RECURSIVE|DISTINCT|ASC|DESC|OVER|PARTITION|WINDOW|ROWS|RANGE|FETCH|NEXT|PRIOR|FIRST|LAST|ONLY|MERGE|USING|MATCHED|TOP|PERCENT|NOLOCK|IF|BEGIN|COMMIT|ROLLBACK|RETURN|DECLARE|TRUNCATE|EXPLAIN|GRANT|REVOKE|SCHEMA|DATABASE|FUNCTION|PROCEDURE|TRIGGER|SEQUENCE|CONSTRAINT|PRIMARY|FOREIGN|KEY|REFERENCES|CHECK|DEFAULT|UNIQUE|VARCHAR|INT|INTEGER|BIGINT|SMALLINT|FLOAT|DOUBLE|DECIMAL|NUMERIC|BOOLEAN|DATE|TIMESTAMP|CHAR|TEXT|SERIAL|IDENTITY|NVARCHAR|NCHAR|BIT|TINYINT|REAL|MONEY|DATETIME|DATETIME2|TIME|CURSOR|OPEN|CLOSE|WHILE|BREAK|CONTINUE|TRY|CATCH|THROW|RAISERROR|PRINT|EXEC|EXECUTE)\b/gi,
+    (m) => `<span class="sql-kw">${m}</span>`);
+
+  h = h.replace(/__PH(\d+)__/g, (_, i) => {
+    const v = placeholders[parseInt(i)];
+    if (v.startsWith('/*') || v.startsWith('--')) return `<span class="sql-cmt">${v}</span>`;
+    return `<span class="sql-str">${v}</span>`;
+  });
+
+  return h;
+}
+
+// ============================================================
+// LINE NUMBERS
+// ============================================================
+function renderWithLineNumbers(html) {
+  const lines = html.split('\n');
+  const nums = lines.map((_, i) => `<span>${i + 1}</span>`).join('');
+  return { html: lines.join('\n'), nums };
+}
+
+// ============================================================
+// UI LOGIC
+// ============================================================
+let lastFormatted = '';
+
+function formatSQLAction() {
+  const input = document.getElementById('codeInput').value;
+  if (!input.trim()) {
+    showLintResults([]);
+    document.getElementById('codeOutput').innerHTML = '<div class="placeholder-msg"><iconify-icon icon="lucide:arrow-left" width="16"></iconify-icon> Formatted SQL will appear here</div>';
+    document.getElementById('outputWrap').querySelector('.line-numbers')?.remove();
+    document.getElementById('codeOutput').classList.remove('has-lines');
+    document.getElementById('headerBadge').style.display = 'none';
+    showToast('Enter some SQL to format');
+    return;
+  }
+
+  const dev = document.getElementById('devInput').value.trim() || 'UNKNOWN';
+  const purpose = document.getElementById('purposeInput').value.trim() || 'TODO: Describe purpose';
+
+  const hdr = ensureHeader(input, dev, purpose);
+  let sqlWithHeader = hdr.sql;
+  document.getElementById('headerBadge').style.display = hdr.added ? 'inline-flex' : 'none';
+
+  const issues = customLint(sqlWithHeader);
+
+  const formatted = formatSQLCode(sqlWithHeader);
+  lastFormatted = formatted;
+
+  const highlighted = highlightSQL(formatted);
+  const { html, nums } = renderWithLineNumbers(highlighted);
+
+  const outputEl = document.getElementById('codeOutput');
+  outputEl.innerHTML = html;
+  outputEl.classList.add('has-lines');
+
+  let lnEl = document.getElementById('outputWrap').querySelector('.line-numbers');
+  if (!lnEl) {
+    lnEl = document.createElement('div');
+    lnEl.className = 'line-numbers';
+    document.getElementById('outputWrap').prepend(lnEl);
+  }
+  lnEl.innerHTML = nums;
+
+  showLintResults(issues);
+}
+
+function showLintResults(issues) {
+  const container = document.getElementById('lintResults');
+  const errors = issues.filter(i => i.type === 'ERROR');
+  const warnings = issues.filter(i => i.type === 'WARN');
+
+  let html = '';
+
+  if (errors.length === 0 && warnings.length === 0) {
+    html = `<div class="success-msg"><iconify-icon icon="lucide:circle-check" width="16"></iconify-icon> All clear — no issues found</div>`;
+    container.innerHTML = html;
+    return;
+  }
+
+  if (errors.length > 0) {
+    html += `<div class="lint-box errors">
+      <div class="lint-box-header" onclick="this.parentElement.classList.toggle('collapsed')">
+        <iconify-icon icon="lucide:circle-x" width="14"></iconify-icon> Errors <span class="count">${errors.length}</span>
+        <iconify-icon icon="lucide:chevron-down" width="12" class="chevron"></iconify-icon>
+      </div>
+      <div class="lint-box-body">
+        ${errors.map(e => `<div class="lint-item"><span class="rule-tag">${esc(e.rule)}</span><span class="msg">${esc(e.message)}</span></div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  if (warnings.length > 0) {
+    html += `<div class="lint-box warnings">
+      <div class="lint-box-header" onclick="this.parentElement.classList.toggle('collapsed')">
+        <iconify-icon icon="lucide:triangle-alert" width="14"></iconify-icon> Warnings <span class="count">${warnings.length}</span>
+        <iconify-icon icon="lucide:chevron-down" width="12" class="chevron"></iconify-icon>
+      </div>
+      <div class="lint-box-body">
+        ${warnings.map(w => `<div class="lint-item"><span class="rule-tag">${esc(w.rule)}</span><span class="msg">${esc(w.message)}</span></div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function clearAll() {
+  document.getElementById('codeInput').value = '';
+  lastFormatted = '';
+  document.getElementById('codeOutput').innerHTML = '<div class="placeholder-msg"><iconify-icon icon="lucide:arrow-left" width="16"></iconify-icon> Formatted SQL will appear here</div>';
+  document.getElementById('codeOutput').classList.remove('has-lines');
+  document.getElementById('outputWrap').querySelector('.line-numbers')?.remove();
+  document.getElementById('lintResults').innerHTML = '';
+  document.getElementById('headerBadge').style.display = 'none';
+}
+
+function copyOutput() {
+  if (!lastFormatted) { showToast('Nothing to copy'); return; }
+  navigator.clipboard.writeText(lastFormatted).then(() => showToast('Copied to clipboard'));
+}
+
+function loadSample() {
+  document.getElementById('codeInput').value = `SELECT *
+FROM users
+WHERE user_name = 'john' AND Active = 1
+JOIN orders ON orders.UserId = users.id
+GROUP BY user_name
+ORDER BY created_at DESC;`;
+  showToast('Sample SQL loaded');
+}
+
+document.getElementById('codeInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const ta = e.target;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    ta.value = ta.value.substring(0, start) + '  ' + ta.value.substring(end);
+    ta.selectionStart = ta.selectionEnd = start + 2;
+  }
+});
+
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  el.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('visible'), 2200);
+}
+
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    formatSQLAction();
+  }
+});
+</script>
+</body>
+</html>
