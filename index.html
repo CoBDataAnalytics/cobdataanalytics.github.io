@@ -220,6 +220,12 @@
                         Technical
                     </span>
                 </button>
+                <button class="filter-btn text-sm font-medium px-5 py-2.5 rounded-full border border-boro-border text-boro-medium" data-filter="visualisation">
+                    <span class="flex items-center gap-2">
+                        <iconify-icon icon="lucide:wrench" width="15"></iconify-icon>
+                        Visualisation
+                    </span>
+                </button>
             </div>
 
             <div class="mb-6">
@@ -269,13 +275,25 @@
                 summary: "A SQL code formatting tool designed to enforce consistent coding standards across projects. The application automatically formats queries according to predefined best practices, while also identifying deviations from standard structure. It highlights formatting errors and surfaces warnings to help developers maintain readability, consistency, and quality in their SQL code.",
                 status: "Complete",
                 link: "technical/sql-formatter/SQL Formatter.html"
+            },
+            {
+                id: 2,
+                title: "PBI Wallpaper Colour Shifter",
+                category: "visualisation",
+                date: "30 April 2026",
+                developer: "Jeffrey Jose",
+                image: "technical/power-bi/colour-shifter/img/colour_shifter_thumbnail.png",
+                summary: "A tool for quickly swapping the colour palette of Power BI wallpaper SVG files. Upload an SVG, enter your desired hex colour codes, and press Shift to generate a recoloured version.",
+                status: "Complete",
+                link: "technical/power-bi/colour-shifter/PBI Colour Shifter.html"
             }
         ];
 
         const categoryConfig = {
             technology: { label: "Technology", color: "bg-blue-50 text-blue-700 border-blue-200", icon: "lucide:cpu" },
             processes: { label: "Processes", color: "bg-amber-50 text-amber-700 border-amber-200", icon: "lucide:git-branch" },
-            technical: { label: "Technical", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "lucide:wrench" }
+            technical: { label: "Technical", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "lucide:wrench" },
+            visualisation: { label: "Visualisation", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "lucide:wrench" }
         };
 
         const statusConfig = {
