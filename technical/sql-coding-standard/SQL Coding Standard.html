@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&A SQL Coding Style Guide</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --org-green: #2C5234;
+            --org-orange: #E87722;
+            --org-black: #000000;
+            --bg-page: #F4F4F4;
+            --bg-white: #FFFFFF;
+            --bg-green-tint: rgba(44, 82, 52, 0.05);
+            --text-primary: #1A1A1A;
+            --text-secondary: #555555;
+            --text-muted: #999999;
+            --border: #E2E2E2;
+            --border-light: #F0F0F0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+            --radius: 8px;
+            --max-width: 880px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .report-container {
+            max-width: var(--max-width);
+            margin: 40px auto;
+            background: var(--bg-white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .report-body { padding: 0 56px; }
+
+        .report-header {
+            padding: 48px 56px 40px;
+            border-bottom: 1px solid var(--border);
+        }
+        .header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 36px;
+        }
+        .logo-wrapper { position: relative; flex-shrink: 0; }
+        .logo { height: 48px; width: auto; display: block; object-fit: contain; }
+        .logo-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            width: 110px;
+            background: var(--org-green);
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 2px;
+            border-radius: 6px;
+        }
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+        .back-btn {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--org-green);
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid var(--org-green);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .back-btn:hover {
+            background: var(--org-green);
+            color: white;
+        }
+        .report-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--org-green);
+        }
+        .report-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--org-black);
+            margin: 0 0 8px 0;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+        .header-accent {
+            width: 56px;
+            height: 4px;
+            background: var(--org-orange);
+            margin-bottom: 24px;
+            border-radius: 2px;
+        }
+        .header-details { display: flex; gap: 28px; flex-wrap: wrap; }
+        .header-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .header-detail-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-section {
+            padding: 32px 56px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .kpi-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 16px;
+            text-align: center;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .kpi-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+        .kpi-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--org-black);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        .kpi-delta { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--org-green); }
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .kpi-card.hl-green .kpi-value { color: var(--org-green); }
+        .kpi-card.hl-orange .kpi-value { color: var(--org-orange); }
+
+        .toc {
+            padding: 28px 56px;
+            border-bottom: 1px solid var(--border);
+        }
+        .toc-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--org-green);
+            margin-bottom: 16px;
+        }
+        .toc ol { list-style: none; padding: 0; margin: 0; }
+        .toc li {
+            display: flex;
+            align-items: baseline;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .toc li:last-child { border-bottom: none; }
+        .toc-num {
+            font-weight: 700;
+            color: var(--org-green);
+            margin-right: 14px;
+            min-width: 24px;
+            font-size: 14px;
+        }
+
+        .chapter { padding: 48px 0 0; }
+        .chapter-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--org-green);
+            margin-bottom: 6px;
+        }
+        .chapter-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--org-black);
+            margin: 0 0 6px 0;
+            letter-spacing: -0.3px;
+        }
+        .chapter-accent {
+            width: 40px;
+            height: 3px;
+            background: var(--org-orange);
+            margin: 14px 0 28px 0;
+            border-radius: 2px;
+        }
+
+        .data-source-box {
+            background: var(--bg-green-tint);
+            border-left: 3px solid var(--org-green);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+        .data-source-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--org-green);
+            margin-bottom: 6px;
+        }
+        .data-source-box p { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.65; }
+
+        .subchapter { margin-bottom: 28px; }
+        .subchapter-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--org-black);
+            margin: 0 0 12px 0;
+        }
+
+        .chapter p, .subchapter p { font-size: 15px; line-height: 1.75; color: var(--text-primary); margin: 0 0 16px 0; }
+        .chapter ul, .subchapter ul { font-size: 15px; line-height: 1.75; color: var(--text-primary); padding-left: 24px; margin: 0 0 16px 0; }
+        .chapter li, .subchapter li { margin-bottom: 8px; }
+        ul li::marker { color: var(--org-orange); }
+
+        pre {
+            background: #1E1E1E;
+            color: #D4D4D4;
+            padding: 20px;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0 0 16px 0;
+            border: 1px solid #333;
+        }
+        code { font-family: 'Fira Code', Consolas, monospace; }
+        p code, li code { background: #F0F0F0; color: #C7254E; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+        strong { color: var(--org-black); }
+        
+        .example-bad { border-left: 3px solid #C0392B; }
+        .example-good { border-left: 3px solid var(--org-green); }
+
+        .chapter-separator { text-align: center; position: relative; height: 32px; }
+        .chapter-separator::before { content: ''; position: absolute; top: 50%; left: 56px; right: 56px; height: 1px; background: var(--border-light); }
+        .chapter-separator::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 6px; height: 6px; background: var(--org-orange); border-radius: 50%; }
+
+        .report-footer { background: var(--org-green); padding: 36px 56px; margin-top: 48px; }
+        .footer-title { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: white; margin: 0 0 12px 0; }
+        .footer-detail { font-size: 13px; color: rgba(255,255,255,0.85); margin: 4px 0; line-height: 1.6; }
+        .footer-detail strong { color: white; font-weight: 600; }
+
+        @media print {
+            body { background: white; }
+            .report-container { margin: 0; box-shadow: none; border-radius: 0; }
+            .report-header { padding: 32px 40px 28px; }
+            .report-body, .kpi-section, .toc { padding-left: 40px; padding-right: 40px; }
+            .report-footer { padding: 28px 40px; }
+            .chapter, .subchapter, .kpi-card { page-break-inside: avoid; }
+            .kpi-card:hover { box-shadow: none; transform: none; }
+            .chapter-separator::before { left: 40px; right: 40px; }
+            *, *::before, *::after { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+            .back-btn:hover { background: transparent; color: var(--org-green); }
+        }
+        @media (max-width: 768px) {
+            .report-container { margin: 0; border-radius: 0; }
+            .report-header, .report-body, .kpi-section, .toc, .report-footer { padding-left: 24px; padding-right: 24px; }
+            .report-title { font-size: 32px; }
+            .kpi-grid { grid-template-columns: 1fr; gap: 12px; }
+            .header-details { flex-direction: column; gap: 8px; }
+            .chapter-separator::before { left: 24px; right: 24px; }
+            .header-top { flex-direction: column; gap: 20px; align-items: flex-start; }
+            .header-right { align-items: flex-start; flex-direction: row-reverse; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-container">
+    <div class="report-header">
+        <div class="header-top">
+            <div class="logo-wrapper">
+                <img src="img/logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="header-right">
+                <a href="../../index.html" class="back-btn">← Back to Project Hub</a>
+                <span class="report-label">Internal Documentation</span>
+            </div>
+        </div>
+        <h1 class="report-title">D&A SQL Coding Style Guide</h1>
+        <div class="header-accent"></div>
+        <div class="header-details">
+            <div class="header-detail"><span class="header-detail-label">Team</span><span>Data Analytics & Insights</span></div>
+            <div class="header-detail"><span class="header-detail-label">Platform</span><span>Azure SQL</span></div>
+            <div class="header-detail"><span class="header-detail-label">Updated</span><span>04 May 2026</span></div>
+        </div>
+    </div>
+
+    <div class="kpi-section">
+        <div class="kpi-grid">
+            <div class="kpi-card hl-green"><div class="kpi-value">Readable</div><div class="kpi-delta">Core Value</div><div class="kpi-label">Transparency</div></div>
+            <div class="kpi-card hl-orange"><div class="kpi-value">Azure SQL</div><div class="kpi-delta">Target Platform</div><div class="kpi-label">T-SQL Standard</div></div>
+            <div class="kpi-card"><div class="kpi-value">PascalCase</div><div class="kpi-delta">Naming Objects</div><div class="kpi-label">Consistency</div></div>
+        </div>
+    </div>
+
+    <div class="toc">
+        <div class="toc-title">Contents</div>
+        <ol>
+            <li><span class="toc-num">01</span>Overview & Purpose</li>
+            <li><span class="toc-num">02</span>Principles & Formatting</li>
+            <li><span class="toc-num">03</span>Object Naming Standards</li>
+            <li><span class="toc-num">04</span>Query Structure & Syntax</li>
+            <li><span class="toc-num">05</span>Best Practices & Data Types</li>
+        </ol>
+    </div>
+
+    <div class="report-body">
+        
+        <!-- CHAPTER 1 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 01</div>
+            <h2 class="chapter-title">Overview & Purpose</h2>
+            <div class="chapter-accent"></div>
+            
+            <div class="data-source-box">
+                <div class="data-source-label">Scope</div>
+                <p>This style guide sets forth guidelines for production SQL code deployed by the Data Analytics & Insights (D&A) team. It is tailored for Azure SQL (T-SQL), but the principles can be applied across other SQL dialects.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">1.1 Purpose</h3>
+                <p>Maintaining reproducibility and transparency is a core value of the D&A team, and a SQL style guide helps us achieve that goal. Adhering to these rules will improve our ability to share, maintain, and extend our analytics when working with SQL.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">1.2 Audience & Adoption</h3>
+                <p>This document is a manual for anyone in the D&A team, particularly those developing, reviewing, or maintaining SQL code for deployment in production environments (including stored procedures, data pipelines, and reporting tools).</p>
+                <ul>
+                    <li>All <strong>new</strong> SQL code is expected to adhere to these standards.</li>
+                    <li><strong>Existing</strong> code should be updated to align where practical, especially when modifications are being made.</li>
+                    <li>Consistent implementation - especially in structure and naming - is important, as partial adoption reduces effectiveness.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="chapter-separator"></div>
+
+        <!-- CHAPTER 2 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 02</div>
+            <h2 class="chapter-title">Principles & Formatting</h2>
+            <div class="chapter-accent"></div>
+            
+            <div class="subchapter">
+                <h3 class="subchapter-title">2.1 Core Principles</h3>
+                <ul>
+                    <li>We take a disciplined and practical approach to writing code.</li>
+                    <li>We believe consistency in style is very important.</li>
+                    <li>We demonstrate intent explicitly in code, via clear structure and comments where needed.</li>
+                </ul>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">2.2 Indentation & Spacing</h3>
+                <p>Consistent indentation improves readability and reduces errors during maintenance. We use 2 spaces per indent (not tabs).</p>
+                <ul>
+                    <li>When using VSCode, set <code>"editor.tabSize": 2</code>, <code>"editor.insertSpaces": true</code>, and <code>"editor.detectIndentation": false</code>.</li>
+                    <li>Each major clause (<code>SELECT</code>, <code>FROM</code>, <code>WHERE</code>, <code>JOIN</code>) should appear on a new line, with subordinate elements indented.</li>
+                    <li>No trailing whitespace.</li>
+                </ul>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">2.3 Capitalization & Keywords</h3>
+                <p>Always capitalize SQL keywords (e.g., <code>SELECT</code>, <code>AS</code>, <code>INNER JOIN</code>). Never name an object with a SQL Server reserved word.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">2.4 Documentation & Comments</h3>
+                <p>All SQL code should include clear documentation explaining intent, assumptions, and non-obvious logic. Use inline comments sparingly; prefer block comments at the start of scripts.</p>
+                <ul>
+                    <li>Comments should go near the top of your query, or at least near the closest <code>SELECT</code>.</li>
+                    <li>Only comment on things that aren't obvious (e.g., why a particular Council ID is hardcoded).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="chapter-separator"></div>
+
+        <!-- CHAPTER 3 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 03</div>
+            <h2 class="chapter-title">Object Naming Standards</h2>
+            <div class="chapter-accent"></div>
+            
+            <div class="subchapter">
+                <h3 class="subchapter-title">3.1 General Naming Rules</h3>
+                <p>Object names will be English words conveying meaning about what the object represents. Avoid numbers, proprietary acronyms, or product-specific names whose meaning might change.</p>
+                <ul>
+                    <li>Use the <strong>singular</strong> form (e.g., <code>Property</code>, not <code>Properties</code>).</li>
+                    <li>Use 'Camel capitalization' (PascalCase) for tables and views (e.g., <code>WasteCollection</code>, <code>PlanningApplication</code>).</li>
+                </ul>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">3.2 Variables & Aliases in Queries</h3>
+                <p>Variable names and column aliases should be underscore-separated and capitalised (SCREAMING_SNAKE_CASE). Do not use single-letter names; be as descriptive as possible.</p>
+                
+<pre class="example-good"><code>-- GOOD: Descriptive aliases
+SELECT 
+  PROP.PROPERTY_URN AS PROPERTY_URN,
+  RES.RESIDENT_ID AS RESIDENT_ID,
+  COUNT(WASTE.COLLECTION_ID) AS COLLECTION_COUNT</code></pre>
+
+<pre class="example-bad"><code>-- BAD: Single letters and camelCase aliases
+SELECT 
+  PROP.PROPERTY_URN,
+  RES.RESIDENT_ID AS rId,
+  COUNT(WASTE.COLLECTION_ID) AS c</code></pre>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">3.3 Table Aliases</h3>
+                <p>Always provide aliases for your tables when joining. Do not use single-letter table names.</p>
+                
+<pre class="example-good"><code>-- GOOD
+FROM Council.Property AS PROP
+INNER JOIN Council.Resident AS RES 
+  ON PROP.PROPERTY_URN = RES.PROPERTY_URN</code></pre>
+
+<pre class="example-bad"><code>-- BAD: Missing AS keyword and single letter alias
+FROM Council.Property P
+INNER JOIN Council.Resident R 
+  ON P.PROPERTY_URN = R.PROPERTY_URN</code></pre>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">3.4 Column Categorization</h3>
+                <p>Categorize columns logically to maintain consistency across the council's data estate:</p>
+                <ul>
+                    <li><strong>Identifiers:</strong> <code>PropertyId</code>, <code>ApplicationId</code></li>
+                    <li><strong>Descriptive fields:</strong> <code>PropertyName</code>, <code>WardName</code></li>
+                    <li><strong>Dates/timestamps:</strong> <code>CollectionDate</code>, <code>ApprovalDate</code></li>
+                    <li><strong>Flags:</strong> <code>IsActiveFlag</code>, <code>IsDemolished</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="chapter-separator"></div>
+
+        <!-- CHAPTER 4 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 04</div>
+            <h2 class="chapter-title">Query Structure & Syntax</h2>
+            <div class="chapter-accent"></div>
+            
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.1 SELECT Statements</h3>
+                <p><code>SELECT</code> goes on its own line. Align all columns to the first column. Always rename aggregates and function-wrapped columns. Always select with table aliases if you have joins, and rename all columns when doing so.</p>
+
+<pre><code>SELECT
+  PROP.PROPERTY_URN AS PROPERTY_URN,
+  RES.LAST_NAME AS LAST_NAME,
+  SUM(CTAX.AMOUNT_DUE) AS TOTAL_RATES_DUE
+FROM Council.Property AS PROP
+INNER JOIN Council.Resident AS RES 
+  ON PROP.PROPERTY_URN = RES.PROPERTY_URN
+INNER JOIN Council.CouncilTax AS CTAX 
+  ON PROP.PROPERTY_URN = CTAX.PROPERTY_URN</code></pre>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.2 FROM & JOIN Statements</h3>
+                <p>Only one table should be in the <code>FROM</code> clause; never use legacy `FROM`-joins (comma separated). Explicitly use <code>INNER JOIN</code> rather than just <code>JOIN</code>. Begin with <code>INNER JOIN</code>s, then list <code>LEFT JOIN</code>s - do not intermingle them unless absolutely necessary.</p>
+                <p>The <code>ON</code> keyword goes on a new indented line. Additional filters go on a double-indented line beginning with <code>AND</code>.</p>
+
+<pre><code>FROM Council.Property AS PROP
+INNER JOIN Council.CouncilTax AS CTAX 
+  ON PROP.PROPERTY_URN = CTAX.PROPERTY_URN
+    AND CTAX.FINANCIAL_YEAR = 2024
+INNER JOIN Council.Ward AS WARD 
+  ON PROP.WARD_CODE = WARD.WARD_CODE
+LEFT JOIN Council.DemolitionOrder AS DEMO 
+  ON PROP.PROPERTY_URN = DEMO.PROPERTY_URN</code></pre>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.3 WHERE & GROUP BY</h3>
+                <p>Multiple <code>WHERE</code> clauses should go on different lines, beginning with the SQL operator. Align <code>GROUP BY</code> columns to the first column. In Azure SQL, you can utilise named variables from your <code>SELECT</code> statement in your <code>GROUP BY</code>.</p>
+
+<pre><code>WHERE
+  WARD.COUNCIL_AREA = 'NORTH'
+  AND PROP.PROPERTY_TYPE = 'RESIDENTIAL'
+GROUP BY
+  PROP.PROPERTY_URN,
+  TOTAL_RATES_DUE</code></pre>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.4 ORDER BY & CASE</h3>
+                <p>Be explicit in the direction of ordering (<code>ASC</code>/<code>DESC</code>). For <code>CASE</code> statements, align each <code>WHEN</code> and <code>THEN</code> on a new indented row.</p>
+
+<pre><code>ORDER BY
+  WARD.WARD_NAME ASC,
+  TOTAL_RATES_DUE DESC
+
+-- CASE Example
+CASE 
+  WHEN PROP.PROPERTY_TYPE = 'RESIDENTIAL' THEN 'DOMESTIC'
+  WHEN PROP.PROPERTY_TYPE = 'COMMERCIAL' THEN 'BUSINESS'
+  ELSE 'OTHER'
+END AS PROPERTY_CATEGORY</code></pre>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.5 Window Functions</h3>
+                <p>Long window functions should be split across multiple lines: one for <code>PARTITION BY</code>, <code>ORDER BY</code>, and frame clauses. Multiple partition keys should be one-per-line. Order should always be explicit. All window functions must be aliased.</p>
+
+<pre><code>ROW_NUMBER() OVER (
+  PARTITION BY 
+    PROP.PROPERTY_URN,
+    CTAX.FINANCIAL_YEAR
+  ORDER BY CTAX.BILL_DATE DESC
+  ROWS UNBOUNDED PRECEDING
+) AS LATEST_BILL_RANK</code></pre>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.6 Common Table Expressions (CTEs)</h3>
+                <p>A CTE is a named subquery defined in a <code>WITH</code> clause, acting as a temporary view. Always use CTEs over inlined subqueries to improve readability. The body of a CTE must be one indent further than the <code>WITH</code> keyword. Close them on a new line.</p>
+
+<pre><code>WITH RATES_PER_PROPERTY AS (
+  SELECT
+    PROPERTY_URN,
+    SUM(AMOUNT_DUE) AS TOTAL_RATES_DUE
+  FROM Council.CouncilTax
+  GROUP BY PROPERTY_URN
+), 
+PROPERTY_DETAILS AS (
+  SELECT
+    PROP.PROPERTY_URN AS PROPERTY_URN,
+    PROP.ADDRESS_LINE_1 AS ADDRESS_LINE_1,
+    RATES.TOTAL_RATES_DUE AS TOTAL_RATES_DUE
+  FROM Council.Property AS PROP
+  INNER JOIN RATES_PER_PROPERTY AS RATES 
+    ON PROP.PROPERTY_URN = RATES.PROPERTY_URN
+)
+SELECT * FROM PROPERTY_DETAILS</code></pre>
+            </div>
+        </div>
+
+        <div class="chapter-separator"></div>
+
+        <!-- CHAPTER 5 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 05</div>
+            <h2 class="chapter-title">Best Practices & Data Types</h2>
+            <div class="chapter-accent"></div>
+            
+            <div class="subchapter">
+                <h3 class="subchapter-title">5.1 Query Performance & Clarity</h3>
+                <p>Write queries that are efficient, maintainable, and predictable.</p>
+                <ul>
+                    <li>Avoid <code>SELECT *</code>; instead, explicitly specify required columns.</li>
+                    <li>Use proper joins with clear conditions.</li>
+                    <li>Ensure filters (<code>WHERE</code>) are applied as early as possible (e.g., inside CTEs before joining to large tables).</li>
+                    <li>Avoid unnecessary subqueries when standard joins or CTEs improve clarity.</li>
+                </ul>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">5.2 Data Types & Integrity</h3>
+                <p>Use appropriate and consistent data types to ensure data integrity and performance across the council's Azure SQL databases.</p>
+                <ul>
+                    <li>Avoid overly generic types such as <code>NVARCHAR(MAX)</code> unless strictly necessary (e.g., holding JSON payloads or long text descriptions).</li>
+                    <li>Prefer explicit sizing and standardized types across similar fields (e.g., all IDs use <code>INT</code> or <code>BIGINT</code>, timestamps use <code>DATETIME2</code>).</li>
+                </ul>
+            </div>
+            
+            <div class="subchapter">
+                <h3 class="subchapter-title">5.3 Version Control</h3>
+                <p>Check code into Azure DevOps (GitHub) early and often. Treat SQL scripts with the same rigor as application code - ensure every deployable script is reviewed and tracked in version control before it is executed against a production environment.</p>
+            </div>
+        </div>
+        <div class="chapter-separator"></div>
+        <!-- CHAPTER 6 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 06</div>
+            <h2 class="chapter-title">Further Information</h2>
+            <div class="chapter-accent"></div>
+            <p>For further information or <b>access to the comprehensive SQL coding standards document which covers view namings in-depth</b>, please reach out to the Data Analytics & Insights Team.</p>
+        </div>
+
+    </div>
+
+    <div class="report-footer">
+        <p class="footer-title">Questions & Further Information</p>
+        <p class="footer-detail">For questions regarding these SQL coding standards, please reach out to the Data Analytics & Insights Team.</p>
+    </div>
+
+</div>
+
+</body>
+</html>
