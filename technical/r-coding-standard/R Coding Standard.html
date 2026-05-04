@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&A R Coding Style Guide</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --org-green: #2C5234;
+            --org-orange: #E87722;
+            --org-black: #000000;
+            --bg-page: #F4F4F4;
+            --bg-white: #FFFFFF;
+            --bg-green-tint: rgba(44, 82, 52, 0.05);
+            --text-primary: #1A1A1A;
+            --text-secondary: #555555;
+            --text-muted: #999999;
+            --border: #E2E2E2;
+            --border-light: #F0F0F0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+            --radius: 8px;
+            --max-width: 880px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .report-container {
+            max-width: var(--max-width);
+            margin: 40px auto;
+            background: var(--bg-white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .report-body { padding: 0 56px; }
+
+        /* HEADER */
+        .report-header {
+            padding: 48px 56px 40px;
+            border-bottom: 1px solid var(--border);
+        }
+        .header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 36px;
+        }
+        .logo-wrapper { position: relative; flex-shrink: 0; }
+        .logo { height: 48px; width: auto; display: block; object-fit: contain; }
+        .logo-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            width: 110px;
+            background: var(--org-green);
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 2px;
+            border-radius: 6px;
+        }
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+        .back-btn {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--org-green);
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid var(--org-green);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .back-btn:hover {
+            background: var(--org-green);
+            color: white;
+        }
+        .report-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--org-green);
+        }
+        .report-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--org-black);
+            margin: 0 0 8px 0;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+        .header-accent {
+            width: 56px;
+            height: 4px;
+            background: var(--org-orange);
+            margin-bottom: 24px;
+            border-radius: 2px;
+        }
+        .header-details { display: flex; gap: 28px; flex-wrap: wrap; }
+        .header-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .header-detail-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* KPI / CONCEPT CARDS */
+        .kpi-section {
+            padding: 32px 56px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .kpi-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 16px;
+            text-align: center;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .kpi-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+        .kpi-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--org-black);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        .kpi-delta { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--org-green); }
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .kpi-card.hl-green .kpi-value { color: var(--org-green); }
+        .kpi-card.hl-orange .kpi-value { color: var(--org-orange); }
+
+        /* TABLE OF CONTENTS */
+        .toc {
+            padding: 28px 56px;
+            border-bottom: 1px solid var(--border);
+        }
+        .toc-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--org-green);
+            margin-bottom: 16px;
+        }
+        .toc ol { list-style: none; padding: 0; margin: 0; }
+        .toc li {
+            display: flex;
+            align-items: baseline;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .toc li:last-child { border-bottom: none; }
+        .toc-num {
+            font-weight: 700;
+            color: var(--org-green);
+            margin-right: 14px;
+            min-width: 24px;
+            font-size: 14px;
+        }
+
+        /* CHAPTERS */
+        .chapter { padding: 48px 0 0; }
+        .chapter-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--org-green);
+            margin-bottom: 6px;
+        }
+        .chapter-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--org-black);
+            margin: 0 0 6px 0;
+            letter-spacing: -0.3px;
+        }
+        .chapter-accent {
+            width: 40px;
+            height: 3px;
+            background: var(--org-orange);
+            margin: 14px 0 28px 0;
+            border-radius: 2px;
+        }
+
+        /* DATA SOURCE / INFO BOX */
+        .data-source-box {
+            background: var(--bg-green-tint);
+            border-left: 3px solid var(--org-green);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+        .data-source-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--org-green);
+            margin-bottom: 6px;
+        }
+        .data-source-box p { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.65; }
+
+        /* SUBCHAPTERS */
+        .subchapter { margin-bottom: 28px; }
+        .subchapter-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--org-black);
+            margin: 0 0 12px 0;
+        }
+
+        /* TYPOGRAPHY */
+        .chapter p, .subchapter p { font-size: 15px; line-height: 1.75; color: var(--text-primary); margin: 0 0 16px 0; }
+        .chapter ul, .subchapter ul { font-size: 15px; line-height: 1.75; color: var(--text-primary); padding-left: 24px; margin: 0 0 16px 0; }
+        .chapter li, .subchapter li { margin-bottom: 8px; }
+        ul li::marker { color: var(--org-orange); }
+
+        /* CODE BLOCKS */
+        pre {
+            background: #1E1E1E;
+            color: #D4D4D4;
+            padding: 20px;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0 0 16px 0;
+            border: 1px solid #333;
+        }
+        code { font-family: 'Fira Code', Consolas, monospace; }
+        p code, li code { background: #F0F0F0; color: #C7254E; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+        strong { color: var(--org-black); }
+
+        /* SEPARATOR */
+        .chapter-separator { text-align: center; position: relative; height: 32px; }
+        .chapter-separator::before { content: ''; position: absolute; top: 50%; left: 56px; right: 56px; height: 1px; background: var(--border-light); }
+        .chapter-separator::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 6px; height: 6px; background: var(--org-orange); border-radius: 50%; }
+
+        /* FOOTER */
+        .report-footer { background: var(--org-green); padding: 36px 56px; margin-top: 48px; }
+        .footer-title { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: white; margin: 0 0 12px 0; }
+        .footer-detail { font-size: 13px; color: rgba(255,255,255,0.85); margin: 4px 0; line-height: 1.6; }
+        .footer-detail strong { color: white; font-weight: 600; }
+
+        /* PRINT / RESPONSIVE */
+        @media print {
+            body { background: white; }
+            .report-container { margin: 0; box-shadow: none; border-radius: 0; }
+            .report-header { padding: 32px 40px 28px; }
+            .report-body, .kpi-section, .toc { padding-left: 40px; padding-right: 40px; }
+            .report-footer { padding: 28px 40px; }
+            .chapter, .subchapter, .kpi-card { page-break-inside: avoid; }
+            .kpi-card:hover { box-shadow: none; transform: none; }
+            .chapter-separator::before { left: 40px; right: 40px; }
+            *, *::before, *::after { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+            .back-btn:hover { background: transparent; color: var(--org-green); }
+        }
+        @media (max-width: 768px) {
+            .report-container { margin: 0; border-radius: 0; }
+            .report-header, .report-body, .kpi-section, .toc, .report-footer { padding-left: 24px; padding-right: 24px; }
+            .report-title { font-size: 32px; }
+            .kpi-grid { grid-template-columns: 1fr; gap: 12px; }
+            .header-details { flex-direction: column; gap: 8px; }
+            .chapter-separator::before { left: 24px; right: 24px; }
+            .header-top { flex-direction: column; gap: 20px; align-items: flex-start; }
+            .header-right { align-items: flex-start; flex-direction: row-reverse; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-container">
+    <div class="report-header">
+        <div class="header-top">
+            <div class="logo-wrapper">
+                <img src="img/logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="header-right">
+                <a href="../../index.html" class="back-btn">← Back to Project Hub</a>
+                <span class="report-label">Internal Documentation</span>
+            </div>
+        </div>
+        <h1 class="report-title">D&A R Coding Style Guide</h1>
+        <div class="header-accent"></div>
+        <div class="header-details">
+            <div class="header-detail"><span class="header-detail-label">Team</span><span>Data Analytics & Insights</span></div>
+            <div class="header-detail"><span class="header-detail-label">Updated</span><span>04 May 2026</span></div>
+        </div>
+    </div>
+
+    <div class="kpi-section">
+        <div class="kpi-grid">
+            <div class="kpi-card hl-green"><div class="kpi-value">Reproducible</div><div class="kpi-delta">Core Value</div><div class="kpi-label">Transparency</div></div>
+            <div class="kpi-card hl-orange"><div class="kpi-value">Tidyverse</div><div class="kpi-delta">Base Standard</div><div class="kpi-label">Style Guide</div></div>
+            <div class="kpi-card"><div class="kpi-value">Styler / Lintr</div><div class="kpi-delta">Enforcement</div><div class="kpi-label">R Packages</div></div>
+        </div>
+    </div>
+
+    <div class="toc">
+        <div class="toc-title">Contents</div>
+        <ol>
+            <li><span class="toc-num">01</span>Introduction to R & RStudio</li>
+            <li><span class="toc-num">02</span>Purpose & Principles</li>
+            <li><span class="toc-num">03</span>Core Rules</li>
+            <li><span class="toc-num">04</span>Additional Rules</li>
+        </ol>
+    </div>
+
+    <div class="report-body">
+        
+        <!-- CHAPTER 1 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 01</div>
+            <h2 class="chapter-title">Introduction to R & RStudio</h2>
+            <div class="chapter-accent"></div>
+            
+            <div class="subchapter">
+                <h3 class="subchapter-title">1.1 What is R?</h3>
+                <p>R is a free, open-source programming language and software environment specifically designed for statistical computing and graphics. It is highly extensible and has become the industry standard for data analysis, providing a vast ecosystem of packages maintained by the global data science community.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">1.2 What is RStudio?</h3>
+                <p>RStudio is an Integrated Development Environment (IDE) for R. It provides a user-friendly interface that includes a code editor, console, plotting window, and environment viewer. RStudio makes writing, debugging, and executing R code significantly easier and more efficient than using base R alone.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">1.3 Why R in D&A?</h3>
+                <p>The Data Analytics & Insights team leverages R to ensure our analytical outputs are fully reproducible and transparent. By combining R with the <code>tidyverse</code> meta-package, we can perform complex data manipulation (<code>dplyr</code>) and generate publication-ready visualizations (<code>ggplot2</code>) in a structured format that can be easily shared, audited, and replicated by others.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">1.4 Getting Started with R and RStudio</h3>
+                <p>To get started with R and RStudio, follow these steps:</p>
+                <ol>
+                    <li>Install R from the Comprehensive R Archive Network (CRAN). As R is not in the suite of software tools, you will need to request installation permission through the request portal.</li>
+                    <li>Install RStudio from the official RStudio website.</li>
+                    <li>Launch RStudio and familiarize yourself with the interface.</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="chapter-separator"></div>
+
+        <!-- CHAPTER 2 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 02</div>
+            <h2 class="chapter-title">Purpose & Principles</h2>
+            <div class="chapter-accent"></div>
+            
+            <div class="data-source-box">
+                <div class="data-source-label">Audience</div>
+                <p>This document is written as a manual for anyone working in the D&A team, but also as a guide for anyone who would like to write clean and clear code that is meant to be shared.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">2.1 Purpose</h3>
+                <p>Maintaining reproducibility and transparency is a core value of the Data Analytics & Insights team, and an R style guide can help us achieve that goal. Additionally, adhering to the basic rules in this style guide will improve our ability to share, maintain, and extend our analytics when working with R.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">2.2 Principles</h3>
+                <ul>
+                    <li>We take a disciplined and practical approach to writing code.</li>
+                    <li>We regularly check-in code to Azure DevOps.</li>
+                    <li>We believe consistency in style is very important.</li>
+                    <li>We demonstrate intent explicitly in code, via clear structure and comments where needed.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="chapter-separator"></div>
+
+        <!-- CHAPTER 3 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 03</div>
+            <h2 class="chapter-title">Core Rules</h2>
+            <div class="chapter-accent"></div>
+            
+            <div class="data-source-box">
+                <div class="data-source-label">Standard</div>
+                <p>D&A follows the conventions outlined in the tidyverse style guide. This is assisted by the R packages <code>styler</code> and <code>lintr</code> which support the tidyverse style guide.</p>
+            </div>
+
+            <p>To ensure compliance across the team, all R scripts should be processed through the Styler add-in within RStudio before finalising pull requests. This automated approach removes the friction of manual formatting and guarantees that all code contributed to the repository adheres to the exact same spatial and syntactical standards.</p>
+        </div>
+
+        <div class="chapter-separator"></div>
+
+        <!-- CHAPTER 4 -->
+        <div class="chapter">
+            <div class="chapter-label">Chapter 04</div>
+            <h2 class="chapter-title">Additional Rules</h2>
+            <div class="chapter-accent"></div>
+            
+            <div class="data-source-box">
+                <div class="data-source-label">Supplement</div>
+                <p>On top of the tidyverse style guide, there are additional rules put in place for R coding within D&A. These are outlined below.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.1 General Practices</h3>
+                <ul>
+                    <li>Check code into Azure DevOps early and often.</li>
+                    <li>Under Code Options, enable "Insert spaces for Tab" with a Tab width of 2.</li>
+                    <li>No trailing whitespace.</li>
+                    <li>Try to only comment on things that aren't obvious about the script (e.g., function is used, etc.), that explains the reasoning behind your code.</li>
+                </ul>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.2 R Project Files</h3>
+                <p>When working within a repository for R, always create an RStudio Project file. An R project file, typically denoted by a <code>.Rproj</code> extension, helps maintain a clean and structured workflow by encapsulating your R scripts, data, and associated files within a single directory.</p>
+                <p>Using an R Project file will ensure that the working directory will always be set to the correct location, which will enable the usage of relative path references. You can also set specific project related settings to ensure consistency across your project.</p>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.3 Documentation</h3>
+                <p>At the beginning of your R script, document the name of the script, purpose of the script and the developers involved. This brief documentation will provide useful information to others about the script, and will also assist you in the future when revisiting your scripts.</p>
+                
+<pre><code>################################################################
+## Name: Addition Of Two Numbers
+## Purpose: This script adds two numbers specified by the user
+## Lead Developer: Shaq O'Neill (Senior Analyst - D&A)
+## Additional Developers (optional): 
+##    Steph Curry (Senior Data Analyst - D&A)
+##    Lebron James (Data Analyst - D&A)
+################################################################</code></pre>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.4 Optimise Installing and Loading Packages</h3>
+                <p>Although RStudio now has automatic checking for missing required packages, it is handy to incorporate installing and loading packages at the start of your script rather than multiple library calls. It should be noted that packages that are not available on CRAN are unable to be installed through the below script.</p>
+
+<pre><code># Package names
+packages &lt;- c("dplyr", "ggplot2", "hrbrthemes")
+
+# Install packages not yet installed
+installed_packages &lt;- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {
+  install.packages(packages[!installed_packages])
+}
+
+# Packages loading
+invisible(lapply(packages, library, character.only = TRUE))</code></pre>
+            </div>
+
+            <div class="subchapter">
+                <h3 class="subchapter-title">4.5 Other Conventions</h3>
+                <p><strong>Variable and Function Names:</strong> Use <code>snake_case</code> for variable and function names. Be descriptive in your naming to enhance readability. Avoid overly short or cryptic names. When formatting a value as a count or percentage, append this to the end of the variable (e.g., <code>separation_count</code>, <code>separation_percentage</code>).</p>
+                
+                <p><strong>Consistency:</strong> Maintain consistent naming conventions throughout your codebase. If you start with snake case, stick to it. When defining column names in data frames, follow the same snake case pattern (e.g., <code>codes_count</code>, <code>hospital_identifier</code>).</p>
+                
+                <p><strong>Commenting:</strong> Commenting what your code does gives another reader the opportunity check that your code does what you intend. Include <em>why</em> you are coding, i.e., if its used in text later, or if you are calculating a numerator for a value. Large comment chunks are fine to break up your code.</p>
+                
+                <p><strong>Avoid Index-based Access:</strong> Where possible, avoid index-based access when working with dataframes (e.g., <code>df[,1] &lt;- NA</code>). Index-based access may run into issues in the future if the data structure changes. If possible, refer to the column names to safeguard against this (e.g., <code>df[, "my_column"] &lt;- NA</code>).</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="report-footer">
+        <p class="footer-title">Questions & Further Information</p>
+        <p class="footer-detail">For questions regarding these R coding standards, please reach out to the Data Analytics & Insights Team.</p>
+    </div>
+
+</div>
+
+</body>
+</html>
