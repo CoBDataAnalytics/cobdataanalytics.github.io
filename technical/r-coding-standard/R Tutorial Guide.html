@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R User Guide — Department Reference Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#2C5234',
+                        'navy-light': '#2C5234',
+                        'navy-dark': '#2C5234',
+                        slate: '#3D4F6F',
+                        brand: '#2C5234',
+                        'brand-light': '#E8F0FE',
+                        'brand-hover': '#073F6E',
+                        surface: '#F8F9FB',
+                        'surface-alt': '#EEF1F6',
+                        'surface-card': '#FFFFFF',
+                        border: '#D5DBE5',
+                        'border-light': '#E8ECF2',
+                        text: '#1E293B',
+                        'text-secondary': '#475569',
+                        'text-muted': '#64748B',
+                        success: '#15803D',
+                        warning: '#B45309',
+                        danger: '#B91C1C',
+                        info: '#0369A1',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: #F8F9FB;
+            color: #1E293B;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #EEF1F6; }
+        ::-webkit-scrollbar-thumb { background: #B0BACA; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #1B2A4A; }
+
+        .section-card {
+            background: #FFFFFF;
+            border: 1px solid #E8ECF2;
+            border-radius: 12px;
+            transition: box-shadow 0.3s ease;
+        }
+        .section-card:hover {
+            box-shadow: 0 4px 24px rgba(27,42,74,0.06);
+        }
+
+        .code-block {
+            background: #1B2A4A;
+            border: 1px solid #2C3E6B;
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            font-family: 'JetBrains Mono', Consolas, monospace;
+            font-size: 0.82rem;
+            line-height: 1.75;
+            overflow-x: auto;
+            position: relative;
+            color: #CBD5E1;
+        }
+        .code-block .comment { color: #64748B; }
+        .code-block .keyword { color: #93C5FD; }
+        .code-block .string { color: #86EFAC; }
+        .code-block .function { color: #C4B5FD; }
+        .code-block .number { color: #FCD34D; }
+
+        .copy-btn {
+            position: absolute; top: 0.6rem; right: 0.6rem;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+            color: #94A3B8; border-radius: 6px; padding: 0.3rem 0.6rem;
+            font-size: 0.7rem; cursor: pointer; transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.15); color: #E2E8F0; }
+
+        .step-number {
+            width: 2.5rem; height: 2.5rem; border-radius: 50%;
+            background: #0B5394; color: #FFFFFF;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+        }
+
+        .toc-link {
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            padding-left: 1rem;
+            color: #475569;
+        }
+        .toc-link:hover, .toc-link.active {
+            border-left-color: #0B5394;
+            color: #0B5394;
+            font-weight: 500;
+        }
+
+        .rstudio-pane {
+            border: 1px solid #E8ECF2;
+            background: #FFFFFF;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .rstudio-pane:hover {
+            border-color: #0B5394;
+            box-shadow: 0 2px 12px rgba(11,83,148,0.08);
+        }
+
+        .func-card {
+            background: #FFFFFF;
+            border: 1px solid #E8ECF2;
+            border-radius: 8px;
+            padding: 1.25rem;
+            transition: all 0.3s;
+        }
+        .func-card:hover {
+            border-color: #0B5394;
+            box-shadow: 0 2px 12px rgba(11,83,148,0.08);
+        }
+
+        .resource-link {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 1rem 1.25rem; border-radius: 8px;
+            background: #FFFFFF;
+            border: 1px solid #E8ECF2;
+            transition: all 0.3s; text-decoration: none;
+            color: #1E293B;
+        }
+        .resource-link:hover {
+            border-color: #0B5394;
+            box-shadow: 0 2px 12px rgba(11,83,148,0.08);
+        }
+
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(to right, #E8ECF2, #D5DBE5, #E8ECF2);
+        }
+
+        .img-container {
+            border-radius: 8px; overflow: hidden;
+            border: 1px solid #E8ECF2;
+        }
+        .img-container img { width: 100%; display: block; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .callout {
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            border-left: 4px solid;
+        }
+        .callout-info {
+            background: #E8F0FE;
+            border-left-color: #0B5394;
+        }
+        .callout-warning {
+            background: #FEF3C7;
+            border-left-color: #B45309;
+        }
+        .callout-danger {
+            background: #FEE2E2;
+            border-left-color: #B91C1C;
+        }
+        .callout-success {
+            background: #DCFCE7;
+            border-left-color: #15803D;
+        }
+
+        #toast {
+            position: fixed; bottom: 2rem; right: 2rem;
+            background: #1B2A4A; color: #FFFFFF;
+            padding: 0.75rem 1.5rem; border-radius: 8px;
+            font-size: 0.85rem; z-index: 10000;
+            transform: translateY(100px); opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(27,42,74,0.2);
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+
+        .nav-link {
+            position: relative;
+            color: #475569;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.25rem 0;
+            transition: color 0.2s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #0B5394;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0; right: 0;
+            height: 2px;
+            background: #0B5394;
+            transform: scaleX(0);
+            transition: transform 0.2s;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            transform: scaleX(1);
+        }
+
+        table th {
+            background: #F1F5F9;
+            font-weight: 600;
+            color: #1E293B;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem !important; }
+            .code-block { font-size: 0.75rem; padding: 1rem; }
+        }
+
+        @media print {
+            nav { display: none; }
+            .no-print { display: none; }
+            body { background: white; }
+            .section-card { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="toast"><i class="fas fa-check mr-2"></i><span id="toast-msg">Copied!</span></div>
+
+<!-- NAVIGATION -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="#" class="flex items-center gap-2 text-navy font-bold text-lg">
+                <div class="w-8 h-8 rounded-lg bg-navy flex items-center justify-center">
+                    
+                    <img src="img/logo.png" alt="Logo" class="logo">
+                </div>
+                <span class="hidden sm:inline">R User Guide</span>
+            </a>
+            <div class="hidden lg:flex items-center gap-5">
+                <a href="#install" class="nav-link">Install</a>
+                <a href="#rstudio" class="nav-link">RStudio</a>
+                <a href="#basics" class="nav-link">Basics</a>
+                <a href="#running" class="nav-link">Running Scripts</a>
+                <a href="#functions" class="nav-link">Functions</a>
+                <a href="#rmarkdown" class="nav-link">RMarkdown</a>
+                <a href="#shiny" class="nav-link">Shiny</a>
+                <a href="#resources" class="nav-link">Resources</a>
+            </div>
+        </div>
+        <a href="javascript:history.back()" class="inline-flex items-center gap-2 px-4 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy-light transition-colors">
+            <i class="fas fa-arrow-left text-xs"></i> Back to Projects
+        </a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="pt-28 pb-20 px-6 bg-gradient-to-b from-navy to-navy-light relative overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
+    <div class="max-w-5xl mx-auto text-center relative">
+        <div class="badge bg-white/10 text-blue-200 border border-white/10 mb-6">
+            <i class="fab fa-r-project mr-1"></i> Internal Reference Document
+        </div>
+
+        <h1 class="hero-title text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 tracking-tight">
+            R Programming<br>User Guide
+        </h1>
+
+        <p class="text-lg md:text-xl text-blue-200/80 max-w-2xl mx-auto leading-relaxed mb-10">
+            A step-by-step reference for installing R, understanding RStudio, running scripts, and interpreting results. Designed for staff who need to execute R scripts and review outputs.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="#install" class="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-navy font-semibold text-sm rounded-lg hover:bg-blue-50 transition-colors shadow-lg">
+                Get Started <i class="fas fa-arrow-down text-xs"></i>
+            </a>
+            <a href="#resources" class="inline-flex items-center gap-2 px-7 py-3.5 border border-white/20 text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-colors">
+                Help Resources <i class="fas fa-external-link-alt text-xs"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- TABLE OF CONTENTS -->
+<section class="py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="section-card p-8 md:p-10">
+            <h2 class="text-xl font-bold text-navy mb-6 flex items-center gap-2">
+                <i class="fas fa-list text-brand text-sm"></i> Table of Contents
+            </h2>
+            <div class="grid md:grid-cols-2 gap-x-12 gap-y-2">
+                <a href="#what-is-r" class="toc-link block py-2">01 — What is R?</a>
+                <a href="#install" class="toc-link block py-2">02 — Installing R & RStudio</a>
+                <a href="#rstudio" class="toc-link block py-2">03 — The RStudio Interface</a>
+                <a href="#basics" class="toc-link block py-2">04 — R Basics & Syntax</a>
+                <a href="#running" class="toc-link block py-2">05 — Running R Scripts</a>
+                <a href="#functions" class="toc-link block py-2">06 — Key Functions</a>
+                <a href="#packages" class="toc-link block py-2">07 — Installing Packages</a>
+                <a href="#rmarkdown" class="toc-link block py-2">08 — RMarkdown Documents</a>
+                <a href="#shiny" class="toc-link block py-2">09 — Shiny Apps</a>
+                <a href="#troubleshooting" class="toc-link block py-2">10 — Troubleshooting</a>
+                <a href="#resources" class="toc-link block py-2">11 — Learning Resources</a>
+                <a href="#glossary" class="toc-link block py-2">12 — Glossary</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 1: WHAT IS R -->
+<section id="what-is-r" class="py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 01</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">What is R?</h2>
+        <div class="section-divider mb-10"></div>
+
+        <div class="grid lg:grid-cols-2 gap-10 items-center">
+            <div>
+                <p class="text-lg text-text-secondary leading-relaxed mb-6">
+                    <strong class="text-text">R</strong> is a free, open-source programming language built for <strong class="text-brand">statistical computing</strong> and <strong class="text-brand">data visualisation</strong>. It is widely used across government, research, and industry for data analysis.
+                </p>
+                <ul class="space-y-3 text-text-secondary">
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-chart-bar text-brand mt-1 text-sm"></i>
+                        <span>Create charts, graphs, and visualisations from data</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-calculator text-brand mt-1 text-sm"></i>
+                        <span>Perform statistical analyses and modelling</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-file-csv text-brand mt-1 text-sm"></i>
+                        <span>Read, clean, and manipulate datasets</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-globe text-brand mt-1 text-sm"></i>
+                        <span>Build interactive web applications (Shiny)</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-file-alt text-brand mt-1 text-sm"></i>
+                        <span>Generate reproducible reports combining code, results, and narrative (RMarkdown)</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="img-container">
+                <img src="img/r-tutorial/r-logo.svg" alt="Data Analysis" loading="lazy">
+            </div>
+        </div>
+
+        <div class="callout callout-info mt-10">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-info-circle text-brand mt-0.5"></i>
+                <div>
+                    <h4 class="font-semibold text-text mb-1">Key Concept: R vs RStudio</h4>
+                    <p class="text-text-secondary text-sm leading-relaxed">
+                        <strong class="text-text">R</strong> is the engine — it performs the computation. <strong class="text-text">RStudio</strong> is the interface — it provides a convenient way to interact with R. You need both installed, but you will only open RStudio (it starts R automatically). Think of R as the engine and RStudio as the dashboard.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 2: INSTALLING R & RSTUDIO -->
+<section id="install" class="py-16 px-6 bg-surface-alt">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 02</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">Installing R & RStudio</h2>
+        <div class="section-divider mb-10"></div>
+
+        <!-- Step 1 -->
+        <div class="mb-14">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="step-number">1</div>
+                <div>
+                    <h3 class="text-xl font-bold text-text">Install R</h3>
+                    <p class="text-text-muted text-sm">R must be installed before RStudio</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <p class="text-text-secondary leading-relaxed mb-5">
+                        Download R from <strong class="text-text">CRAN</strong> (the Comprehensive R Archive Network). This is the official source.
+                    </p>
+                    <a href="https://cran.r-project.org/" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand text-white font-semibold text-sm rounded-lg hover:bg-brand-hover transition-colors mb-6">
+                        <i class="fas fa-download"></i> Download R from CRAN
+                    </a>
+
+                    <div class="space-y-3 text-sm">
+                        <div class="section-card p-4">
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <i class="fab fa-windows text-brand"></i>
+                                <span class="font-semibold text-text">Windows</span>
+                            </div>
+                            <p class="text-text-muted">Click "Download R for Windows" → "base" → Download the .exe → Run the installer with default settings</p>
+                        </div>
+                        <div class="section-card p-4">
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <i class="fab fa-apple text-brand"></i>
+                                <span class="font-semibold text-text">macOS</span>
+                            </div>
+                            <p class="text-text-muted">Click "Download R for macOS" → Download the .pkg file → Run the installer with default settings</p>
+                        </div>
+                        <div class="section-card p-4">
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <i class="fab fa-linux text-brand"></i>
+                                <span class="font-semibold text-text">Linux</span>
+                            </div>
+                            <p class="text-text-muted">Click "Download R for Linux" → Follow the instructions for your distribution</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="img-container">
+                    <img src="img/r-tutorial/r.png" alt="CRAN Website" loading="lazy">
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div>
+            <div class="flex items-center gap-4 mb-6">
+                <div class="step-number">2</div>
+                <div>
+                    <h3 class="text-xl font-bold text-text">Install RStudio</h3>
+                    <p class="text-text-muted text-sm">The user-friendly interface for R</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <p class="text-text-secondary leading-relaxed mb-5">
+                        Download the <strong class="text-text">free</strong> version of RStudio Desktop from Posit's website. This is the program you will open each day.
+                    </p>
+                    <a href="https://posit.co/download/rstudio-desktop/" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand text-white font-semibold text-sm rounded-lg hover:bg-brand-hover transition-colors mb-6">
+                        <i class="fas fa-download"></i> Download RStudio Desktop (Free)
+                    </a>
+
+                    <div class="callout callout-success">
+                        <h4 class="font-semibold text-text mb-2 text-sm"><i class="fas fa-clipboard-check text-success mr-1"></i>Installation Checklist</h4>
+                        <ul class="space-y-1.5 text-sm text-text-secondary">
+                            <li class="flex items-center gap-2"><i class="far fa-square text-text-muted"></i> R installed — verify by opening Terminal/CMD and typing <code class="text-brand bg-brand-light px-1 rounded text-xs">R --version</code></li>
+                            <li class="flex items-center gap-2"><i class="far fa-square text-text-muted"></i> RStudio installed successfully</li>
+                            <li class="flex items-center gap-2"><i class="far fa-square text-text-muted"></i> Open RStudio — it should display "R version" in the Console pane</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="img-container">
+                    <img src="img/r-tutorial/rstudio.png" alt="RStudio Download Page" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: RSTUDIO INTERFACE -->
+<section id="rstudio" class="py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 03</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">The RStudio Interface</h2>
+        <div class="section-divider mb-10"></div>
+
+        <p class="text-text-secondary leading-relaxed mb-10 max-w-3xl">
+            When you open RStudio, you will see <strong class="text-text">four panes</strong>. Each serves a specific purpose:
+        </p>
+
+        <div class="grid grid-cols-2 gap-4 mb-12 max-w-4xl mx-auto">
+            <div class="rstudio-pane col-span-2 md:col-span-1 p-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-3 h-3 rounded-full bg-success"></div>
+                    <span class="font-semibold text-text text-base">Source (Top-Left)</span>
+                </div>
+                <div class="text-text-secondary text-sm leading-relaxed">
+                    <p class="mb-2"><strong class="text-brand">Your code editor.</strong> Write and edit R scripts here. It provides syntax highlighting and auto-completion.</p>
+                    <ul class="space-y-1 text-xs text-text-muted">
+                        <li>✏️ Write and edit .R script files</li>
+                        <li>✏️ Create RMarkdown .Rmd documents</li>
+                        <li>✏️ Build Shiny applications</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="rstudio-pane col-span-2 md:col-span-1 p-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-3 h-3 rounded-full bg-info"></div>
+                    <span class="font-semibold text-text text-base">Environment (Top-Right)</span>
+                </div>
+                <div class="text-text-secondary text-sm leading-relaxed">
+                    <p class="mb-2"><strong class="text-brand">Your workspace inventory.</strong> Every variable, dataset, and function you create appears here.</p>
+                    <ul class="space-y-1 text-xs text-text-muted">
+                        <li>📊 View all variables and their values</li>
+                        <li>📊 Click datasets to view them as spreadsheets</li>
+                        <li>📊 Import data using the Import button</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="rstudio-pane col-span-2 md:col-span-1 p-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-3 h-3 rounded-full bg-danger"></div>
+                    <span class="font-semibold text-text text-base">Console (Bottom-Left)</span>
+                </div>
+                <div class="text-text-secondary text-sm leading-relaxed">
+                    <p class="mb-2"><strong class="text-brand">Where R runs.</strong> Output and errors appear here. You can also type commands directly.</p>
+                    <ul class="space-y-1 text-xs text-text-muted">
+                        <li>▶️ View output and error messages</li>
+                        <li>▶️ Type commands at the <code class="text-brand">&gt;</code> prompt</li>
+                        <li>▶️ Install packages here</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="rstudio-pane col-span-2 md:col-span-1 p-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-3 h-3 rounded-full bg-warning"></div>
+                    <span class="font-semibold text-text text-base">Files/Plots/Help (Bottom-Right)</span>
+                </div>
+                <div class="text-text-secondary text-sm leading-relaxed">
+                    <p class="mb-2"><strong class="text-brand">The multi-purpose pane.</strong> Browse files, view plots, check packages, and read documentation.</p>
+                    <ul class="space-y-1 text-xs text-text-muted">
+                        <li>📁 Files — browse your file system</li>
+                        <li>📈 Plots — view generated charts</li>
+                        <li>📖 Help — read function documentation</li>
+                        <li>📦 Packages — view installed packages</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="img-container max-w-4xl mx-auto">
+            <img src="img/r-tutorial/r-interface.png" alt="RStudio Interface Layout" loading="lazy">
+            <p class="text-center text-text-muted text-xs mt-2 p-2">RStudio's four-pane layout — Source, Environment, Console, and Files/Plots/Help</p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 4: R BASICS -->
+<section id="basics" class="py-16 px-6 bg-surface-alt">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 04</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">R Basics & Syntax</h2>
+        <div class="section-divider mb-10"></div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+            <!-- Assignment -->
+            <div class="section-card p-7">
+                <h3 class="text-lg font-bold text-text mb-3"><i class="fas fa-arrow-right text-brand mr-2 text-sm"></i>Assignment (Creating Variables)</h3>
+                <p class="text-text-secondary text-sm mb-4">Use <code class="text-brand bg-brand-light px-1 py-0.5 rounded text-xs">&lt;-</code> to store values. Think of it as "put this value into this name."</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="comment"># Store a number</span>
+x <span class="keyword">&lt;-</span> <span class="number">42</span>
+
+<span class="comment"># Store text (a "string")</span>
+name <span class="keyword">&lt;-</span> <span class="string">"Hello World"</span>
+
+<span class="comment"># Store a list (a "vector")</span>
+scores <span class="keyword">&lt;-</span> <span class="function">c</span>(<span class="number">85</span>, <span class="number">90</span>, <span class="number">78</span>, <span class="number">92</span>)
+
+<span class="comment"># Print the values</span>
+x         <span class="comment"># Returns: 42</span>
+name      <span class="comment"># Returns: "Hello World"</span>
+scores    <span class="comment"># Returns: 85 90 78 92</span>
+                </div>
+            </div>
+
+            <!-- Data Types -->
+            <div class="section-card p-7">
+                <h3 class="text-lg font-bold text-text mb-3"><i class="fas fa-database text-brand mr-2 text-sm"></i>Data Types</h3>
+                <p class="text-text-secondary text-sm mb-4">R has several basic types of data. The most common ones are:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="comment"># Numeric (decimal numbers)</span>
+height <span class="keyword">&lt;-</span> <span class="number">5.9</span>
+
+<span class="comment"># Integer (whole numbers)</span>
+age <span class="keyword">&lt;-</span> <span class="number">25L</span>
+
+<span class="comment"># Character (text/strings)</span>
+greeting <span class="keyword">&lt;-</span> <span class="string">"Hello"</span>
+
+<span class="comment"># Logical (TRUE / FALSE)</span>
+is_active <span class="keyword">&lt;-</span> <span class="keyword">TRUE</span>
+
+<span class="comment"># Check the type</span>
+<span class="function">class</span>(height)    <span class="comment"># "numeric"</span>
+<span class="function">class</span>(greeting)  <span class="comment"># "character"</span>
+                </div>
+            </div>
+
+            <!-- Vectors -->
+            <div class="section-card p-7">
+                <h3 class="text-lg font-bold text-text mb-3"><i class="fas fa-list text-brand mr-2 text-sm"></i>Vectors</h3>
+                <p class="text-text-secondary text-sm mb-4">A vector is an ordered list of items of the <strong class="text-brand">same type</strong>. The most basic data structure in R.</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="comment"># Create with c()</span>
+fruits <span class="keyword">&lt;-</span> <span class="function">c</span>(<span class="string">"apple"</span>, <span class="string">"banana"</span>, <span class="string">"cherry"</span>)
+temps  <span class="keyword">&lt;-</span> <span class="function">c</span>(<span class="number">72</span>, <span class="number">68</span>, <span class="number">75</span>, <span class="number">80</span>, <span class="number">69</span>)
+
+<span class="comment"># Access elements (R starts counting at 1)</span>
+fruits[<span class="number">1</span>]      <span class="comment"># "apple"</span>
+fruits[<span class="number">2</span>:<span class="number">3</span>]    <span class="comment"># "banana" "cherry"</span>
+
+<span class="comment"># Quick statistics</span>
+<span class="function">mean</span>(temps)    <span class="comment"># Average: 72.8</span>
+<span class="function">sum</span>(temps)     <span class="comment"># Total: 364</span>
+<span class="function">length</span>(temps)  <span class="comment"># Count: 5</span>
+                </div>
+            </div>
+
+            <!-- Data Frames -->
+            <div class="section-card p-7">
+                <h3 class="text-lg font-bold text-text mb-3"><i class="fas fa-table text-brand mr-2 text-sm"></i>Data Frames</h3>
+                <p class="text-text-secondary text-sm mb-4">A data frame is like a spreadsheet — rows and columns. Most data in R is stored this way.</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="comment"># Create a data frame</span>
+records <span class="keyword">&lt;-</span> <span class="function">data.frame</span>(
+  name  = <span class="function">c</span>(<span class="string">"Alice"</span>, <span class="string">"Bob"</span>, <span class="string">"Carol"</span>),
+  age   = <span class="function">c</span>(<span class="number">22</span>, <span class="number">25</span>, <span class="number">21</span>),
+  grade = <span class="function">c</span>(<span class="string">"A"</span>, <span class="string">"B"</span>, <span class="string">"A"</span>)
+)
+
+<span class="comment"># View as spreadsheet</span>
+<span class="function">View</span>(records)
+
+<span class="comment"># Access a column</span>
+records$name   <span class="comment"># Alice, Bob, Carol</span>
+records[, <span class="number">2</span>]   <span class="comment"># 22, 25, 21 (2nd column)</span>
+records[<span class="number">1</span>, ]   <span class="comment"># First row (Alice's data)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 5: RUNNING R SCRIPTS -->
+<section id="running" class="py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 05</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">Running R Scripts</h2>
+        <div class="section-divider mb-10"></div>
+
+        <p class="text-text-secondary leading-relaxed mb-10 max-w-3xl">
+            An R script is a text file (with a <code class="text-brand bg-brand-light px-1 py-0.5 rounded text-xs">.R</code> extension) containing R code. Here are the ways to run one:
+        </p>
+
+        <div class="space-y-5 mb-14">
+            <div class="section-card p-7">
+                <div class="flex items-start gap-4">
+                    <div class="step-number text-sm">A</div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-text mb-2">Run Line by Line <span class="badge bg-success/10 text-success ml-2">Recommended</span></h3>
+                        <p class="text-text-secondary text-sm mb-3">Place your cursor on the line you want to run, then press <kbd class="bg-surface-alt text-text px-2 py-0.5 rounded text-xs border border-border">Ctrl + Enter</kbd> (Windows/Linux) or <kbd class="bg-surface-alt text-text px-2 py-0.5 rounded text-xs border border-border">Cmd + Enter</kbd> (Mac). The line executes in the Console.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card p-7">
+                <div class="flex items-start gap-4">
+                    <div class="step-number text-sm">B</div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-text mb-2">Run the Entire Script</h3>
+                        <p class="text-text-secondary text-sm mb-3">Press <kbd class="bg-surface-alt text-text px-2 py-0.5 rounded text-xs border border-border">Ctrl + Shift + Enter</kbd> or click the <strong class="text-brand">"Source"</strong> button at the top of the Source pane.</p>
+                        <div class="code-block text-xs">
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="comment"># Or use the source() command in the Console:</span>
+<span class="function">source</span>(<span class="string">"my_script.R"</span>)
+
+<span class="comment"># With the full file path:</span>
+<span class="function">source</span>(<span class="string">"C:/Users/Name/Documents/my_script.R"</span>)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card p-7">
+                <div class="flex items-start gap-4">
+                    <div class="step-number text-sm">C</div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-text mb-2">Run Selected Code</h3>
+                        <p class="text-text-secondary text-sm">Highlight the specific lines you want to run, then press <kbd class="bg-surface-alt text-text px-2 py-0.5 rounded text-xs border border-border">Ctrl + Enter</kbd>. Only the selected code will execute.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card p-7">
+                <div class="flex items-start gap-4">
+                    <div class="step-number text-sm">D</div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-text mb-2">Run from Command Line</h3>
+                        <div class="code-block text-xs">
+                            <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="comment"># In Terminal / Command Prompt:</span>
+Rscript my_script.R
+
+<span class="comment"># Save output to a file:</span>
+Rscript my_script.R > output.txt
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step-by-step for running MY script -->
+        <div class="callout callout-success">
+            <h3 class="text-lg font-bold text-text mb-4">
+                <i class="fas fa-play-circle text-success mr-2"></i>
+                How to Run a Colleague's Script
+            </h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center text-success font-bold text-xs flex-shrink-0">1</div>
+                    <p class="text-text-secondary">Open RStudio (double-click the RStudio icon)</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center text-success font-bold text-xs flex-shrink-0">2</div>
+                    <p class="text-text-secondary">Go to <strong class="text-text">File → Open File…</strong> and navigate to the <code class="text-brand bg-brand-light px-1 rounded">.R</code> script</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center text-success font-bold text-xs flex-shrink-0">3</div>
+                    <p class="text-text-secondary">If the script requires packages, install them first (see <a href="#packages" class="text-brand underline">Section 07</a>)</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center text-success font-bold text-xs flex-shrink-0">4</div>
+                    <p class="text-text-secondary">Ensure any required data files are in the <strong class="text-text">same folder</strong> as the script</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center text-success font-bold text-xs flex-shrink-0">5</div>
+                    <p class="text-text-secondary">Set the working directory: <strong class="text-text">Session → Set Working Directory → To Source File Location</strong></p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center text-success font-bold text-xs flex-shrink-0">6</div>
+                    <p class="text-text-secondary">Press <kbd class="bg-surface-alt text-text px-1.5 py-0.5 rounded text-xs border border-border">Ctrl + Shift + Enter</kbd> to run the entire script</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center text-success font-bold text-xs flex-shrink-0">7</div>
+                    <p class="text-text-secondary">Check the <strong class="text-text">Console</strong> for output and the <strong class="text-text">Plots</strong> tab for charts</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 6: KEY FUNCTIONS -->
+<section id="functions" class="py-16 px-6 bg-surface-alt">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 06</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">Key Functions</h2>
+        <div class="section-divider mb-10"></div>
+
+        <p class="text-text-secondary leading-relaxed mb-10 max-w-3xl">
+            Functions are reusable recipes — you provide inputs (arguments), and they produce a result. These are the functions you will encounter most frequently.
+        </p>
+
+        <!-- Data Import/Export -->
+        <h3 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-md bg-brand/10 flex items-center justify-center"><i class="fas fa-file-import text-brand text-xs"></i></span>
+            Importing & Exporting Data
+        </h3>
+        <div class="grid md:grid-cols-2 gap-4 mb-10">
+            <div class="func-card">
+                <code class="text-brand font-mono text-sm">read.csv()</code>
+                <p class="text-text-secondary text-sm mt-1.5">Read a CSV file into R as a data frame.</p>
+                <div class="code-block mt-3 text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i></button>
+data <span class="keyword">&lt;-</span> <span class="function">read.csv</span>(<span class="string">"my_data.csv"</span>)
+                </div>
+            </div>
+            <div class="func-card">
+                <code class="text-brand font-mono text-sm">read_excel()</code>
+                <p class="text-text-secondary text-sm mt-1.5">Read an Excel file. Requires the <code class="text-brand">readxl</code> package.</p>
+                <div class="code-block mt-3 text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i></button>
+<span class="function">library</span>(readxl)
+data <span class="keyword">&lt;-</span> <span class="function">read_excel</span>(<span class="string">"my_data.xlsx"</span>)
+                </div>
+            </div>
+            <div class="func-card">
+                <code class="text-brand font-mono text-sm">write.csv()</code>
+                <p class="text-text-secondary text-sm mt-1.5">Save a data frame to a CSV file.</p>
+                <div class="code-block mt-3 text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i></button>
+<span class="function">write.csv</span>(data, <span class="string">"output.csv"</span>, row.names = <span class="keyword">FALSE</span>)
+                </div>
+            </div>
+            <div class="func-card">
+                <code class="text-brand font-mono text-sm">readLines()</code>
+                <p class="text-text-secondary text-sm mt-1.5">Read text files line by line.</p>
+                <div class="code-block mt-3 text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i></button>
+text <span class="keyword">&lt;-</span> <span class="function">readLines</span>(<span class="string">"document.txt"</span>)
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Exploration -->
+        <h3 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-md bg-brand/10 flex items-center justify-center"><i class="fas fa-search text-brand text-xs"></i></span>
+            Exploring Data
+        </h3>
+        <div class="grid md:grid-cols-3 gap-3 mb-10">
+            <div class="func-card"><code class="text-brand font-mono text-sm">head()</code><p class="text-text-muted text-xs mt-1.5">Show first 6 rows of a dataset</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">tail()</code><p class="text-text-muted text-xs mt-1.5">Show last 6 rows</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">str()</code><p class="text-text-muted text-xs mt-1.5">Structure: type, rows, columns</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">summary()</code><p class="text-text-muted text-xs mt-1.5">Min, max, median, mean, quartiles</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">dim()</code><p class="text-text-muted text-xs mt-1.5">Dimensions (rows × columns)</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">names()</code><p class="text-text-muted text-xs mt-1.5">Column names</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">View()</code><p class="text-text-muted text-xs mt-1.5">Open spreadsheet viewer</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">nrow() / ncol()</code><p class="text-text-muted text-xs mt-1.5">Number of rows / columns</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">class()</code><p class="text-text-muted text-xs mt-1.5">Object type (data.frame, etc.)</p></div>
+        </div>
+
+        <!-- Statistics -->
+        <h3 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-md bg-brand/10 flex items-center justify-center"><i class="fas fa-chart-line text-brand text-xs"></i></span>
+            Statistics
+        </h3>
+        <div class="grid md:grid-cols-3 gap-3 mb-10">
+            <div class="func-card"><code class="text-brand font-mono text-sm">mean()</code><p class="text-text-muted text-xs mt-1.5">Average. Use <code class="text-brand">na.rm=TRUE</code> to ignore NAs</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">median()</code><p class="text-text-muted text-xs mt-1.5">Middle value when sorted</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">sd()</code><p class="text-text-muted text-xs mt-1.5">Standard deviation</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">var()</code><p class="text-text-muted text-xs mt-1.5">Variance</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">cor()</code><p class="text-text-muted text-xs mt-1.5">Correlation (-1 to +1)</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">table()</code><p class="text-text-muted text-xs mt-1.5">Frequency count of each value</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">lm()</code><p class="text-text-muted text-xs mt-1.5">Linear regression model</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">t.test()</code><p class="text-text-muted text-xs mt-1.5">Compare means between two groups</p></div>
+            <div class="func-card"><code class="text-brand font-mono text-sm">sum()</code><p class="text-text-muted text-xs mt-1.5">Add up all values</p></div>
+        </div>
+
+        <!-- Visualisation -->
+        <h3 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-md bg-brand/10 flex items-center justify-center"><i class="fas fa-paint-brush text-brand text-xs"></i></span>
+            Visualisation
+        </h3>
+        <div class="grid md:grid-cols-2 gap-4 mb-10">
+            <div class="func-card">
+                <code class="text-brand font-mono text-sm">plot()</code>
+                <p class="text-text-secondary text-sm mt-1.5">Base R scatter plot.</p>
+                <div class="code-block mt-3 text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i></button>
+<span class="function">plot</span>(x = data$age, y = data$score,
+     main = <span class="string">"Age vs Score"</span>,
+     xlab = <span class="string">"Age"</span>, ylab = <span class="string">"Score"</span>)
+                </div>
+            </div>
+            <div class="func-card">
+                <code class="text-brand font-mono text-sm">hist()</code>
+                <p class="text-text-secondary text-sm mt-1.5">Histogram showing distribution.</p>
+                <div class="code-block mt-3 text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i></button>
+<span class="function">hist</span>(data$age,
+     main = <span class="string">"Age Distribution"</span>,
+     col = <span class="string">"steelblue"</span>)
+                </div>
+            </div>
+            <div class="func-card">
+                <code class="text-brand font-mono text-sm">ggplot() + geom_*()</code>
+                <p class="text-text-secondary text-sm mt-1.5">Powerful plotting from the <code class="text-brand">ggplot2</code> package.</p>
+                <div class="code-block mt-3 text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i></button>
+<span class="function">library</span>(ggplot2)
+<span class="function">ggplot</span>(data, <span class="function">aes</span>(x = age, y = score)) +
+  <span class="function">geom_point</span>() +
+  <span class="function">geom_smooth</span>(method = <span class="string">"lm"</span>) +
+  <span class="function">labs</span>(title = <span class="string">"Age vs Score"</span>)
+                </div>
+            </div>
+            <div class="func-card">
+                <code class="text-brand font-mono text-sm">barplot() / boxplot()</code>
+                <p class="text-text-secondary text-sm mt-1.5">Bar charts and box plots.</p>
+                <div class="code-block mt-3 text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i></button>
+<span class="function">boxplot</span>(score ~ group, data = data,
+        col = <span class="function">c</span>(<span class="string">"#0B5394"</span>, <span class="string">"#2C3E6B"</span>))
+                </div>
+            </div>
+        </div>
+
+        <!-- dplyr -->
+        <h3 class="text-lg font-bold text-text mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-md bg-brand/10 flex items-center justify-center"><i class="fas fa-filter text-brand text-xs"></i></span>
+            Data Manipulation (dplyr)
+        </h3>
+        <div class="code-block mb-6">
+            <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="function">library</span>(dplyr)
+
+<span class="comment"># The five main verbs of dplyr:</span>
+
+data <span class="keyword">%&gt;%</span>                            <span class="comment"># Start with your data</span>
+  <span class="function">filter</span>(age > <span class="number">20</span>) <span class="keyword">%&gt;%</span>             <span class="comment"># Keep rows matching condition</span>
+  <span class="function">select</span>(name, age, score) <span class="keyword">%&gt;%</span>    <span class="comment"># Keep specific columns</span>
+  <span class="function">mutate</span>(category = <span class="function">ifelse</span>(score > <span class="number">80</span>, <span class="string">"High"</span>, <span class="string">"Low"</span>)) <span class="keyword">%&gt;%</span>  <span class="comment"># Add new column</span>
+  <span class="function">arrange</span>(<span class="function">desc</span>(score)) <span class="keyword">%&gt;%</span>        <span class="comment"># Sort (highest first)</span>
+  <span class="function">summarise</span>(avg = <span class="function">mean</span>(score))    <span class="comment"># Calculate summary</span>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-info-circle text-brand mt-0.5"></i>
+                <div>
+                    <h4 class="font-semibold text-text mb-1 text-sm">What is %>% ?</h4>
+                    <p class="text-text-secondary text-sm leading-relaxed">
+                        The <code class="text-brand bg-brand-light px-1 rounded">%&gt;%</code> symbol is the <strong class="text-text">pipe operator</strong>. It passes the result of the left side as the first argument to the right side. Read it as <strong class="text-brand">"and then"</strong>. Example: <code class="bg-surface-alt px-1 rounded">data %>% filter() %>% select()</code> means "Take the data, AND THEN filter it, AND THEN select columns."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 7: PACKAGES -->
+<section id="packages" class="py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 07</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">Installing Packages</h2>
+        <div class="section-divider mb-10"></div>
+
+        <p class="text-text-secondary leading-relaxed mb-10 max-w-3xl">
+            Packages are add-ons that extend R's capabilities. Think of R as a phone and packages as apps — you install them once, then load them whenever needed.
+        </p>
+
+        <div class="grid lg:grid-cols-2 gap-6 mb-10">
+            <div class="section-card p-7">
+                <h3 class="text-lg font-bold text-text mb-3"><i class="fas fa-download text-brand mr-2 text-sm"></i>Installing a Package</h3>
+                <p class="text-text-secondary text-sm mb-4">You only need to install a package <strong class="text-brand">once</strong> per computer:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="comment"># Install a single package</span>
+<span class="function">install.packages</span>(<span class="string">"ggplot2"</span>)
+
+<span class="comment"># Install multiple at once</span>
+<span class="function">install.packages</span>(<span class="function">c</span>(<span class="string">"dplyr"</span>, <span class="string">"tidyr"</span>, <span class="string">"readxl"</span>))
+                </div>
+            </div>
+
+            <div class="section-card p-7">
+                <h3 class="text-lg font-bold text-text mb-3"><i class="fas fa-box-open text-brand mr-2 text-sm"></i>Loading a Package</h3>
+                <p class="text-text-secondary text-sm mb-4">You must load a package <strong class="text-brand">every time</strong> you restart R:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="comment"># Load the package</span>
+<span class="function">library</span>(ggplot2)
+
+<span class="comment"># Now use its functions</span>
+<span class="function">ggplot</span>(data, <span class="function">aes</span>(x, y)) + <span class="function">geom_point</span>()
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card overflow-hidden">
+            <div class="p-5 border-b border-border-light bg-surface-alt/50">
+                <h3 class="text-lg font-bold text-text"><i class="fas fa-cubes text-brand mr-2 text-sm"></i>Common Packages</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-border-light">
+                            <th class="text-left p-4">Package</th>
+                            <th class="text-left p-4">Purpose</th>
+                            <th class="text-left p-4">Key Functions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-border-light hover:bg-surface-alt/50 transition-colors">
+                            <td class="p-4"><code class="text-brand font-mono">ggplot2</code></td>
+                            <td class="p-4 text-text-secondary">Data visualisation</td>
+                            <td class="p-4 text-text-muted font-mono text-xs">ggplot(), geom_point(), geom_bar()</td>
+                        </tr>
+                        <tr class="border-b border-border-light hover:bg-surface-alt/50 transition-colors">
+                            <td class="p-4"><code class="text-brand font-mono">dplyr</code></td>
+                            <td class="p-4 text-text-secondary">Data manipulation</td>
+                            <td class="p-4 text-text-muted font-mono text-xs">filter(), select(), mutate(), summarise()</td>
+                        </tr>
+                        <tr class="border-b border-border-light hover:bg-surface-alt/50 transition-colors">
+                            <td class="p-4"><code class="text-brand font-mono">tidyr</code></td>
+                            <td class="p-4 text-text-secondary">Reshaping data</td>
+                            <td class="p-4 text-text-muted font-mono text-xs">pivot_longer(), pivot_wider()</td>
+                        </tr>
+                        <tr class="border-b border-border-light hover:bg-surface-alt/50 transition-colors">
+                            <td class="p-4"><code class="text-brand font-mono">readxl</code></td>
+                            <td class="p-4 text-text-secondary">Read Excel files</td>
+                            <td class="p-4 text-text-muted font-mono text-xs">read_excel(), read_xlsx()</td>
+                        </tr>
+                        <tr class="border-b border-border-light hover:bg-surface-alt/50 transition-colors">
+                            <td class="p-4"><code class="text-brand font-mono">shiny</code></td>
+                            <td class="p-4 text-text-secondary">Interactive web apps</td>
+                            <td class="p-4 text-text-muted font-mono text-xs">shinyApp(), fluidPage(), renderPlot()</td>
+                        </tr>
+                        <tr class="border-b border-border-light hover:bg-surface-alt/50 transition-colors">
+                            <td class="p-4"><code class="text-brand font-mono">rmarkdown</code></td>
+                            <td class="p-4 text-text-secondary">Dynamic reports</td>
+                            <td class="p-4 text-text-muted font-mono text-xs">render(), html_document(), pdf_document()</td>
+                        </tr>
+                        <tr class="hover:bg-surface-alt/50 transition-colors">
+                            <td class="p-4"><code class="text-brand font-mono">stringr</code></td>
+                            <td class="p-4 text-text-secondary">Text manipulation</td>
+                            <td class="p-4 text-text-muted font-mono text-xs">str_detect(), str_replace(), str_extract()</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 8: RMARKDOWN -->
+<section id="rmarkdown" class="py-16 px-6 bg-surface-alt">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 08</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">RMarkdown Documents</h2>
+        <div class="section-divider mb-10"></div>
+
+        <p class="text-text-secondary leading-relaxed mb-10 max-w-3xl">
+            RMarkdown combines <strong class="text-text">narrative text</strong>, <strong class="text-text">R code</strong>, and <strong class="text-text">results</strong> (tables, plots) in a single document. When you "knit" it, R runs all the code and produces a polished report in HTML, PDF, or Word format.
+        </p>
+
+        <div class="grid lg:grid-cols-2 gap-10 mb-10">
+            <div>
+                <h3 class="text-lg font-bold text-text mb-5">Creating an RMarkdown Document</h3>
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 rounded-full bg-brand/10 flex items-center justify-center text-brand font-bold text-xs flex-shrink-0">1</div>
+                        <p class="text-text-secondary text-sm">In RStudio: <strong class="text-text">File → New File → R Markdown…</strong></p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 rounded-full bg-brand/10 flex items-center justify-center text-brand font-bold text-xs flex-shrink-0">2</div>
+                        <p class="text-text-secondary text-sm">Enter a title, select output format (HTML, PDF, or Word), and click OK</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 rounded-full bg-brand/10 flex items-center justify-center text-brand font-bold text-xs flex-shrink-0">3</div>
+                        <p class="text-text-secondary text-sm">Write text in <strong class="text-brand">Markdown</strong> and R code in <strong class="text-brand">code chunks</strong></p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 rounded-full bg-brand/10 flex items-center justify-center text-brand font-bold text-xs flex-shrink-0">4</div>
+                        <p class="text-text-secondary text-sm">Click <strong class="text-brand">"Knit"</strong> or press <kbd class="bg-surface text-text px-1.5 py-0.5 rounded text-xs border border-border">Ctrl + Shift + K</kbd></p>
+                    </div>
+                </div>
+
+                <div class="callout callout-info mt-6">
+                    <h4 class="font-semibold text-text mb-1 text-sm"><i class="fas fa-keyboard text-brand mr-1"></i>Code Chunk Shortcut</h4>
+                    <p class="text-text-secondary text-xs">Press <kbd class="bg-surface text-text px-1 py-0.5 rounded text-xs border border-border">Ctrl + Alt + I</kbd> (Windows) or <kbd class="bg-surface text-text px-1 py-0.5 rounded text-xs border border-border">Cmd + Option + I</kbd> (Mac) to insert a code chunk.</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold text-text mb-5">RMarkdown Structure</h3>
+                <div class="code-block text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="comment">---</span>
+<span class="keyword">title:</span> <span class="string">"Analysis Report"</span>
+<span class="keyword">author:</span> <span class="string">"Your Name"</span>
+<span class="keyword">output:</span> <span class="string">html_document</span>
+<span class="comment">---</span>
+
+<span class="comment">## Introduction</span>
+
+This is regular text. It will appear
+in the final report as formatted prose.
+
+<span class="comment">```{r}</span>
+<span class="comment"># This is a code chunk — R will run this</span>
+<span class="function">library</span>(ggplot2)
+data <span class="keyword">&lt;-</span> <span class="function">read.csv</span>(<span class="string">"data.csv"</span>)
+<span class="function">summary</span>(data)
+<span class="comment">```</span>
+
+<span class="comment">## Results</span>
+
+The chart below shows the findings:
+
+<span class="comment">```{r}</span>
+<span class="function">ggplot</span>(data, <span class="function">aes</span>(x = var1, y = var2)) +
+  <span class="function">geom_point</span>()
+<span class="comment">```</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card p-7">
+            <h3 class="text-lg font-bold text-text mb-5">
+                <i class="fas fa-play text-brand mr-2 text-sm"></i>
+                Rendering an RMarkdown File
+            </h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="font-semibold text-text mb-2 text-sm">In RStudio</h4>
+                    <ol class="space-y-1.5 text-text-secondary text-sm list-decimal list-inside">
+                        <li>Open the <code class="text-brand bg-brand-light px-1 rounded">.Rmd</code> file</li>
+                        <li>Ensure required packages are installed</li>
+                        <li>Click <strong class="text-brand">"Knit"</strong> at the top of the Source pane</li>
+                        <li>A preview will appear; the output file is saved alongside the .Rmd</li>
+                    </ol>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text mb-2 text-sm">From Console</h4>
+                    <div class="code-block text-xs">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="function">library</span>(rmarkdown)
+<span class="function">render</span>(<span class="string">"report.Rmd"</span>)
+
+<span class="comment"># Specify output format</span>
+<span class="function">render</span>(<span class="string">"report.Rmd"</span>,
+       output_format = <span class="string">"pdf_document"</span>)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 9: SHINY -->
+<section id="shiny" class="py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 09</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">Shiny Apps</h2>
+        <div class="section-divider mb-10"></div>
+
+        <p class="text-text-secondary leading-relaxed mb-10 max-w-3xl">
+            Shiny is an R package for building <strong class="text-text">interactive web applications</strong> from R. Users interact with sliders, dropdowns, and buttons, and see results update in real time — no web development knowledge required.
+        </p>
+
+        <div class="grid lg:grid-cols-2 gap-10 mb-10">
+            <div>
+                <h3 class="text-lg font-bold text-text mb-5">Shiny App Structure</h3>
+                <p class="text-text-secondary text-sm mb-4">Every Shiny app has two components:</p>
+                <ul class="space-y-3 text-text-secondary text-sm mb-6">
+                    <li class="flex items-start gap-3">
+                        <span class="badge bg-brand/10 text-brand border border-brand/10 text-xs">UI</span>
+                        <span><strong class="text-text">User Interface</strong> — defines the layout, input controls, and output displays</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="badge bg-brand/10 text-brand border border-brand/10 text-xs">Server</span>
+                        <span><strong class="text-text">Server Logic</strong> — contains the R code that produces outputs based on user inputs</span>
+                    </li>
+                </ul>
+
+                <div class="callout callout-info">
+                    <h4 class="font-semibold text-text mb-1 text-sm"><i class="fas fa-folder-open text-brand mr-1"></i>Creating a New Shiny App</h4>
+                    <p class="text-text-secondary text-xs">In RStudio: <strong class="text-text">File → New File → Shiny Web App…</strong> → Enter a name → Create</p>
+                </div>
+            </div>
+
+            <div>
+                <div class="code-block text-xs">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="function">library</span>(shiny)
+
+<span class="comment"># ── UI: What the user sees ──</span>
+ui <span class="keyword">&lt;-</span> <span class="function">fluidPage</span>(
+  <span class="function">titlePanel</span>(<span class="string">"Sample Dashboard"</span>),
+
+  <span class="function">sidebarLayout</span>(
+    <span class="function">sidebarPanel</span>(
+      <span class="function">sliderInput</span>(<span class="string">"bins"</span>,
+                  <span class="string">"Number of bins:"</span>,
+                  min = <span class="number">5</span>, max = <span class="number">50</span>,
+                  value = <span class="number">20</span>)
+    ),
+    <span class="function">mainPanel</span>(
+      <span class="function">plotOutput</span>(<span class="string">"distPlot"</span>)
+    )
+  )
+)
+
+<span class="comment"># ── Server: What R computes ──</span>
+server <span class="keyword">&lt;-</span> <span class="keyword">function</span>(input, output) {
+  output$distPlot <span class="keyword">&lt;-</span> <span class="function">renderPlot</span>({
+    x    <span class="keyword">&lt;-</span> faithful[, <span class="number">2</span>]
+    bins <span class="keyword">&lt;-</span> <span class="function">seq</span>(<span class="function">min</span>(x), <span class="function">max</span>(x),
+                length.out = input$bins + <span class="number">1</span>)
+    <span class="function">hist</span>(x, breaks = bins,
+         col = <span class="string">"#0B5394"</span>, border = <span class="string">"white"</span>)
+  })
+}
+
+<span class="comment"># ── Run the app ──</span>
+<span class="function">shinyApp</span>(ui = ui, server = server)
+                </div>
+            </div>
+        </div>
+
+        <div class="callout callout-success">
+            <h3 class="text-lg font-bold text-text mb-4">
+                <i class="fas fa-rocket text-success mr-2"></i>
+                How to Run a Shiny App
+            </h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="font-semibold text-text mb-2 text-sm">From RStudio</h4>
+                    <ol class="space-y-1.5 text-text-secondary text-sm list-decimal list-inside">
+                        <li>Open the <code class="text-brand bg-brand-light px-1 rounded">app.R</code> file</li>
+                        <li>Ensure <code class="text-brand bg-brand-light px-1 rounded">shiny</code> is installed</li>
+                        <li>Click <strong class="text-brand">"Run App"</strong> at the top of the Source pane</li>
+                        <li>A browser window opens with the app</li>
+                        <li>To stop: press <kbd class="bg-surface text-text px-1.5 py-0.5 rounded text-xs border border-border">Esc</kbd> or click the Stop sign in the Console</li>
+                    </ol>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text mb-2 text-sm">From Console</h4>
+                    <div class="code-block text-xs">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button>
+<span class="function">library</span>(shiny)
+<span class="function">runApp</span>(<span class="string">"path/to/app_folder"</span>)
+
+<span class="comment"># Open directly in browser</span>
+<span class="function">runApp</span>(<span class="string">"app_folder"</span>,
+       launch.browser = <span class="keyword">TRUE</span>)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 10: TROUBLESHOOTING -->
+<section id="troubleshooting" class="py-16 px-6 bg-surface-alt">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 10</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">Troubleshooting</h2>
+        <div class="section-divider mb-10"></div>
+
+        <p class="text-text-secondary leading-relaxed mb-10 max-w-3xl">
+            Common errors and their solutions:
+        </p>
+
+        <div class="space-y-4 mb-10">
+            <div class="section-card p-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-7 h-7 rounded-md bg-danger/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-times text-danger text-xs"></i>
+                    </div>
+                    <div>
+                        <code class="text-danger font-mono text-sm">Error: object 'x' not found</code>
+                        <p class="text-text-secondary text-sm mt-1.5"><strong class="text-text">Meaning:</strong> The variable doesn't exist. You may have forgotten to run the line that creates it, or misspelt the name (R is case-sensitive).</p>
+                        <p class="text-success text-sm mt-1"><strong>Fix:</strong> Run the script from the beginning, or check spelling.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card p-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-7 h-7 rounded-md bg-danger/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-times text-danger text-xs"></i>
+                    </div>
+                    <div>
+                        <code class="text-danger font-mono text-sm">there is no package called 'ggplot2'</code>
+                        <p class="text-text-secondary text-sm mt-1.5"><strong class="text-text">Meaning:</strong> The package has not been installed on this computer.</p>
+                        <p class="text-success text-sm mt-1"><strong>Fix:</strong> Run <code class="text-brand bg-brand-light px-1 rounded">install.packages("ggplot2")</code> first.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card p-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-7 h-7 rounded-md bg-danger/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-times text-danger text-xs"></i>
+                    </div>
+                    <div>
+                        <code class="text-danger font-mono text-sm">could not find function "ggplot"</code>
+                        <p class="text-text-secondary text-sm mt-1.5"><strong class="text-text">Meaning:</strong> You're calling a function from a package that is not loaded.</p>
+                        <p class="text-success text-sm mt-1"><strong>Fix:</strong> Add <code class="text-brand bg-brand-light px-1 rounded">library(ggplot2)</code> at the top of your script.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card p-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-7 h-7 rounded-md bg-danger/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-times text-danger text-xs"></i>
+                    </div>
+                    <div>
+                        <code class="text-danger font-mono text-sm">file 'data.csv' does not exist</code>
+                        <p class="text-text-secondary text-sm mt-1.5"><strong class="text-text">Meaning:</strong> R cannot find the file. The working directory is probably incorrect.</p>
+                        <p class="text-success text-sm mt-1"><strong>Fix:</strong> Use <strong class="text-text">Session → Set Working Directory → To Source File Location</strong> or provide the full file path.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card p-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-7 h-7 rounded-md bg-warning/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-exclamation text-warning text-xs"></i>
+                    </div>
+                    <div>
+                        <code class="text-warning font-mono text-sm">Warning: Removed N rows containing missing values</code>
+                        <p class="text-text-secondary text-sm mt-1.5"><strong class="text-text">Meaning:</strong> A <em>warning</em>, not an error. The code ran, but some data had missing values (NA) that were skipped.</p>
+                        <p class="text-success text-sm mt-1"><strong>Fix:</strong> Usually safe to ignore. Check with <code class="text-brand bg-brand-light px-1 rounded">sum(is.na(data))</code> if unexpected.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card p-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-7 h-7 rounded-md bg-danger/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-times text-danger text-xs"></i>
+                    </div>
+                    <div>
+                        <code class="text-danger font-mono text-sm">unexpected symbol in "my data"</code>
+                        <p class="text-text-secondary text-sm mt-1.5"><strong class="text-text">Meaning:</strong> Syntax error — a missing comma, quote, parenthesis, or a space in a variable name.</p>
+                        <p class="text-success text-sm mt-1"><strong>Fix:</strong> Use underscores: <code class="text-brand bg-brand-light px-1 rounded">my_data</code> not <code class="bg-danger/5 text-danger px-1 rounded">my data</code>. Check for missing punctuation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card p-7">
+            <h4 class="font-bold text-text mb-4"><i class="fas fa-life-ring text-brand mr-2 text-sm"></i>General Tips</h4>
+            <div class="grid md:grid-cols-2 gap-6 text-sm text-text-secondary">
+                <div>
+                    <ul class="space-y-2">
+                        <li>✦ Always read the <strong class="text-text">full error message</strong></li>
+                        <li>✦ Run scripts <strong class="text-text">from the top</strong> — R executes in order</li>
+                        <li>✦ Check your working directory: <code class="text-brand bg-brand-light px-1 rounded">getwd()</code></li>
+                    </ul>
+                </div>
+                <div>
+                    <ul class="space-y-2">
+                        <li>✦ Use <code class="text-brand bg-brand-light px-1 rounded">?function_name</code> for help</li>
+                        <li>✦ Restart R: <strong class="text-text">Session → Restart R</strong></li>
+                        <li>✦ Search the exact error message online</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 11: RESOURCES -->
+<section id="resources" class="py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 11</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">Learning Resources</h2>
+        <div class="section-divider mb-10"></div>
+
+        <p class="text-text-secondary leading-relaxed mb-10 max-w-3xl">
+            Recommended free resources for further learning:
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-3">
+            <a href="https://r4ds.had.co.nz/" target="_blank" rel="noopener" class="resource-link">
+                <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-book text-brand text-sm"></i>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text text-sm">R for Data Science (R4DS)</h4>
+                    <p class="text-text-muted text-xs">The definitive free online book for learning modern R.</p>
+                </div>
+                <i class="fas fa-external-link-alt text-text-muted text-xs ml-auto"></i>
+            </a>
+
+            <a href="https://www.statmethods.net/" target="_blank" rel="noopener" class="resource-link">
+                <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-graduation-cap text-brand text-sm"></i>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text text-sm">Quick-R by DataCamp</h4>
+                    <p class="text-text-muted text-xs">Concise reference for R functions with examples.</p>
+                </div>
+                <i class="fas fa-external-link-alt text-text-muted text-xs ml-auto"></i>
+            </a>
+
+            <a href="https://posit.co/resources/cheatsheets/" target="_blank" rel="noopener" class="resource-link">
+                <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-file-alt text-brand text-sm"></i>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text text-sm">Posit Cheatsheets</h4>
+                    <p class="text-text-muted text-xs">Downloadable 2-page reference sheets for every major R package.</p>
+                </div>
+                <i class="fas fa-external-link-alt text-text-muted text-xs ml-auto"></i>
+            </a>
+
+            <a href="https://stackoverflow.com/questions/tagged/r" target="_blank" rel="noopener" class="resource-link">
+                <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fab fa-stack-overflow text-brand text-sm"></i>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text text-sm">Stack Overflow [r]</h4>
+                    <p class="text-text-muted text-xs">Q&A site — most errors have already been answered here.</p>
+                </div>
+                <i class="fas fa-external-link-alt text-text-muted text-xs ml-auto"></i>
+            </a>
+
+            <a href="https://www.coursera.org/learn/r-programming" target="_blank" rel="noopener" class="resource-link">
+                <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-video text-brand text-sm"></i>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text text-sm">Coursera: R Programming (Johns Hopkins)</h4>
+                    <p class="text-text-muted text-xs">Structured course — free to audit.</p>
+                </div>
+                <i class="fas fa-external-link-alt text-text-muted text-xs ml-auto"></i>
+            </a>
+
+            <a href="https://rstudio-education.github.io/hopr/" target="_blank" rel="noopener" class="resource-link">
+                <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-hands-helping text-brand text-sm"></i>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text text-sm">Hands-On Programming with R</h4>
+                    <p class="text-text-muted text-xs">Free book with practical examples and projects.</p>
+                </div>
+                <i class="fas fa-external-link-alt text-text-muted text-xs ml-auto"></i>
+            </a>
+
+            <a href="https://shiny.rstudio.com/tutorial/" target="_blank" rel="noopener" class="resource-link">
+                <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-desktop text-brand text-sm"></i>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text text-sm">Official Shiny Tutorials</h4>
+                    <p class="text-text-muted text-xs">Step-by-step lessons for building interactive apps.</p>
+                </div>
+                <i class="fas fa-external-link-alt text-text-muted text-xs ml-auto"></i>
+            </a>
+
+            <a href="https://community.rstudio.com/" target="_blank" rel="noopener" class="resource-link">
+                <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-users text-brand text-sm"></i>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-text text-sm">Posit Community Forum</h4>
+                    <p class="text-text-muted text-xs">Friendly community for R and RStudio questions.</p>
+                </div>
+                <i class="fas fa-external-link-alt text-text-muted text-xs ml-auto"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 12: GLOSSARY -->
+<section id="glossary" class="py-16 px-6 bg-surface-alt">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="badge bg-brand-light text-brand">Section 12</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-3">Glossary</h2>
+        <div class="section-divider mb-10"></div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Vector</h4>
+                <p class="text-text-muted text-xs">An ordered list of items of the same type. The most basic data structure in R.</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Data Frame</h4>
+                <p class="text-text-muted text-xs">A table with rows and columns (like a spreadsheet). The standard structure for analysis.</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Function</h4>
+                <p class="text-text-muted text-xs">Reusable code that takes inputs (arguments) and produces an output. Called with parentheses: <code>name()</code></p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Package / Library</h4>
+                <p class="text-text-muted text-xs">A collection of functions extending R. Install once with <code>install.packages()</code>, load with <code>library()</code>.</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Working Directory</h4>
+                <p class="text-text-muted text-xs">The folder where R looks for files. Check with <code>getwd()</code>, change with <code>setwd()</code>.</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Console</h4>
+                <p class="text-text-muted text-xs">The interactive command line where code is executed and results displayed.</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Script</h4>
+                <p class="text-text-muted text-xs">A text file (.R) containing R code that can be saved and run as a unit.</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Knit</h4>
+                <p class="text-text-muted text-xs">The process of converting an RMarkdown file into a finished document by running all code chunks.</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Pipe (%>%)</h4>
+                <p class="text-text-muted text-xs">Passes the left side's result as the first argument to the right side. Read as "and then."</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">NA</h4>
+                <p class="text-text-muted text-xs">"Not Available" — R's representation of missing data. Use <code>na.rm = TRUE</code> to ignore in calculations.</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">Tibble</h4>
+                <p class="text-text-muted text-xs">A modern data frame from the tidyverse. Prints more neatly and is stricter about types.</p>
+            </div>
+            <div class="func-card">
+                <h4 class="text-brand font-mono text-sm mb-1">CRAN</h4>
+                <p class="text-text-muted text-xs">Comprehensive R Archive Network. The official repository for R and its packages.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="py-16 px-6 bg-navy text-white">
+    <div class="max-w-6xl mx-auto">
+        <div class="grid md:grid-cols-3 gap-12 mb-12">
+            <!-- Contact -->
+            <div>
+                <h3 class="text-lg font-bold mb-5">Questions & Support</h3>
+                <p class="text-blue-200/70 leading-relaxed mb-6 text-sm">
+                    If you encounter issues running any script or have questions about R, please contact:
+                </p>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-blue-200/70">
+                        <div class="w-8 h-8 rounded-md bg-white/10 flex items-center justify-center">
+                            <i class="fas fa-comments text-sm"></i>
+                        </div>
+                        <span class="text-sm">Team: Data Analytics & Insights Team</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-5">Quick Links</h3>
+                <div class="space-y-2 text-sm">
+                    <a href="https://cran.r-project.org/" target="_blank" rel="noopener" class="block text-blue-200/70 hover:text-white transition-colors">Download R (CRAN)</a>
+                    <a href="https://posit.co/download/rstudio-desktop/" target="_blank" rel="noopener" class="block text-blue-200/70 hover:text-white transition-colors">Download RStudio</a>
+                    <a href="https://r4ds.had.co.nz/" target="_blank" rel="noopener" class="block text-blue-200/70 hover:text-white transition-colors">R for Data Science Book</a>
+                    <a href="https://posit.co/resources/cheatsheets/" target="_blank" rel="noopener" class="block text-blue-200/70 hover:text-white transition-colors">R Cheatsheets</a>
+                    <a href="https://stackoverflow.com/questions/tagged/r" target="_blank" rel="noopener" class="block text-blue-200/70 hover:text-white transition-colors">Stack Overflow R</a>
+                    <a href="javascript:history.back()" class="block text-blue-200/70 hover:text-white transition-colors">← Back to Projects</a>
+                </div>
+            </div>
+
+            <!-- Key Shortcuts -->
+            <div>
+                <h3 class="text-lg font-bold mb-5">Keyboard Shortcuts</h3>
+                <div class="space-y-2.5 text-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-blue-200/70">Run current line</span>
+                        <span class="text-blue-200/40 font-mono text-xs bg-white/5 px-2 py-0.5 rounded">Ctrl + Enter</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-blue-200/70">Run entire script</span>
+                        <span class="text-blue-200/40 font-mono text-xs bg-white/5 px-2 py-0.5 rounded">Ctrl + Shift + Enter</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-blue-200/70">Insert code chunk</span>
+                        <span class="text-blue-200/40 font-mono text-xs bg-white/5 px-2 py-0.5 rounded">Ctrl + Alt + I</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-blue-200/70">Knit RMarkdown</span>
+                        <span class="text-blue-200/40 font-mono text-xs bg-white/5 px-2 py-0.5 rounded">Ctrl + Shift + K</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-blue-200/70">Restart R</span>
+                        <span class="text-blue-200/40 font-mono text-xs bg-white/5 px-2 py-0.5 rounded">Ctrl + Shift + F10</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-blue-200/70">Assignment operator</span>
+                        <span class="text-blue-200/40 font-mono text-xs bg-white/5 px-2 py-0.5 rounded">Alt + -</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-blue-200/70">Pipe operator</span>
+                        <span class="text-blue-200/40 font-mono text-xs bg-white/5 px-2 py-0.5 rounded">Ctrl + Shift + M</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-blue-200/40 text-xs">
+            <span>Internal Reference Document — R Programming User Guide</span>
+            <span>Last updated: May, 2026</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Toast
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-msg').textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // Copy code
+    function copyCode(btn) {
+        const codeBlock = btn.closest('.code-block');
+        const clone = codeBlock.cloneNode(true);
+        const copyBtn = clone.querySelector('.copy-btn');
+        if (copyBtn) copyBtn.remove();
+        const code = clone.textContent.trim();
+        navigator.clipboard.writeText(code).then(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+            showToast('Code copied to clipboard');
+            setTimeout(() => { btn.innerHTML = '<i class="far fa-copy"></i> Copy'; }, 2000);
+        });
+    }
+
+    // GSAP - subtle fade-in animations
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.utils.toArray('section').forEach(section => {
+        gsap.utils.toArray(section.querySelectorAll('.section-card, .func-card, .resource-link, .rstudio-pane, .code-block, .callout, .img-container')).forEach((el, i) => {
+            gsap.from(el, {
+                y: 20,
+                opacity: 0,
+                duration: 0.6,
+                delay: i * 0.03,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 92%",
+                    toggleActions: "play none none none"
+                }
+            });
+        });
+    });
+
+    // Active nav link
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            if (window.scrollY >= sectionTop) {
+                current = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
